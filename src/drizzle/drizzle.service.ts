@@ -7,9 +7,15 @@ import * as schema from './schema/schema';
 export class DrizzleService {
 	readonly db: NeonDatabase<typeof schema>;
 	constructor() {
-		const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } =
-			process.env;
-		const URL = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`;
+		const {
+			PGHOST,
+			PGDATABASE,
+			PGUSER,
+			PGPASSWORD,
+			ENDPOINT_ID,
+			PGPORT = '5432',
+		} = process.env;
+		const URL = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`;
 
 		const pool = new Pool({ connectionString: URL });
 
