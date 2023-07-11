@@ -14,6 +14,7 @@ import providers from './providers';
 import seekers from './seekers';
 import { relations } from 'drizzle-orm';
 import catalog_requests from './catalog_requests';
+import adminAccess from './admin_access';
 
 export const userTypeEnum = pgEnum('user_type', ['individual', 'business']);
 export const businessEntityTypeEnum = pgEnum('business_entity_type', [
@@ -36,6 +37,7 @@ const users = pgTable('users', {
 	fcmTokens: varchar('fcm_tokens', { length: 256 }).array(),
 	userType: userTypeEnum('user_type'),
 	businessType: businessEntityTypeEnum('business_type'),
+	adminAccessId: serial('admin_access_id').references(() => adminAccess.id),
 });
 export default users;
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -47,6 +49,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	// 	fields: [users.providerId],
 	// 	references: [providers.id],
 	// }),
+	adminAccess: one(adminAccess, {
+		fields: [users.adminAccessId],
+		references: [adminAccess.id],
+	}),
 	contactInfo: many(users_contact_info),
 	catalogRequests: many(catalog_requests),
 }));

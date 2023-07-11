@@ -11,7 +11,9 @@ import { UserCatalogRequestsService } from './user-catalog-requests.service';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users-catalog-requests')
 @Controller(':uid/catalog-requests')
 export class UserCatalogRequestsController {
 	constructor(
@@ -83,21 +85,27 @@ export class UserCatalogRequestsController {
 	 * Add Items to the Request
 	 */
 	@Post(':id/items')
-	addItems(@Param('id') id: string) {}
+	addItems(@Param('id') id: string) {
+		return 'not-implemented';
+	}
 
 	/**
 	 * Authorize User
 	 * remove items from request
 	 */
 	@Delete(':id/items')
-	removeItems(@Param('id') id: string) {}
+	removeItems(@Param('id') id: string) {
+		return 'not-implemented';
+	}
 
 	/**
 	 * Authorize User
 	 * Edit Items Quantity
 	 */
 	@Patch(':id/items/:itemId')
-	editItems(@Param('id') id: string) {}
+	editItems(@Param('id') id: string) {
+		return 'not-implemented';
+	}
 
 	/**
 	 * Authorize User

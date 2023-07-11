@@ -2,23 +2,16 @@ import {
 	Body,
 	Controller,
 	Delete,
-	ForbiddenException,
 	Get,
-	Headers,
-	MethodNotAllowedException,
 	Param,
 	Patch,
 	Post,
-	Query,
 	Req,
-	Res,
-	StreamableFile,
 } from '@nestjs/common';
 import {
 	ApiBody,
 	ApiCreatedResponse,
 	ApiOkResponse,
-	ApiQuery,
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
@@ -29,7 +22,6 @@ import { UsersService } from './users.service';
 
 import { User } from './entities/user.entity';
 import { Auth } from '../../auth/decorators/auth.decorator';
-import { Public } from '../../auth/decorators/public.decorator';
 import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
 
 @ApiTags('users')
@@ -44,8 +36,8 @@ export class UsersController {
 	 */
 	@Post()
 	@ApiCreatedResponse({ type: User })
-	create(@Body() createUserDto: CreateUserDto): Promise<User> {
-		return this.usersService.create(createUserDto) as any;
+	create(@Body() createUserDto: CreateUserDto) {
+		return 'not-implemented';
 	}
 
 	/**
@@ -55,9 +47,8 @@ export class UsersController {
 	 */
 	@Get()
 	@ApiOkResponse({ type: User, isArray: true })
-	findAll(@Req() request: Request & { user: any }): Promise<User[]> {
-		// console.log({ user: request.user });
-		return this.usersService.findAll() as any;
+	findAll(@Req() request: Request & { user: any }) {
+		return 'not-implemented';
 	}
 
 	/**
@@ -66,14 +57,18 @@ export class UsersController {
 	 */
 	@Get('me')
 	@ApiOkResponse({ type: User })
-	getMe(@Req() request: Request) {}
+	getMe(@Req() request: Request) {
+		return 'not-implemented';
+	}
 
 	/**
 	 * Authorize Kham/Sales/CSR or the user with same id
 	 */
-	@Get(':id')
+	@Get(':uid')
 	@ApiOkResponse({ type: User })
-	findOne(@Param('id') id: string) {}
+	findOne(@Param('uid') uid: string) {
+		return 'not-implemented';
+	}
 
 	/**
 	 * Authorize the user with same id
@@ -81,7 +76,9 @@ export class UsersController {
 	 */
 	@Patch(':uid')
 	@ApiResponse({ type: User })
-	update(@Param('uid') uid: string, @Body() updateUserDto: UpdateUserDto) {}
+	update(@Param('uid') uid: string, @Body() updateUserDto: UpdateUserDto) {
+		return 'not-implemented';
+	}
 
 	/**
 	 *
@@ -89,14 +86,16 @@ export class UsersController {
 	 */
 	@Delete(':uid')
 	delete(@Param('uid') uid: string) {
-		return this.usersService.remove(uid);
+		return 'not-implemented';
 	}
 
 	/**
 	 * add and FirebaseMessaging token to their profile
 	 */
 	@Patch(':uid/contact-info')
-	changeContactUserInfo(@Param('uid') uid: string) {}
+	changeContactUserInfo(@Param('uid') uid: string) {
+		return 'not-implemented';
+	}
 	//#region Notifications
 
 	/**
@@ -105,7 +104,7 @@ export class UsersController {
 	@ApiBody({ type: AddFcmTokenDto })
 	@Post(':uid/fcm-token')
 	addFcmToken(@Param('uid') uid: string, @Body('token') token: string) {
-		return this.usersService.addFcmToken(uid, token);
+		return 'not-implemented';
 	}
 
 	//#endregion

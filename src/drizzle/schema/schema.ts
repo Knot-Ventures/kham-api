@@ -29,12 +29,15 @@ import catalogRequests, {
 	catalogRequestsRelations,
 	catalogRequestStatusEnum,
 } from './catalog_requests';
-
+import adminAccess, { adminRoleEnum } from './admin_access';
 export {
 	users,
 	usersRelations,
 	userTypeEnum,
 	businessEntityTypeEnum,
+	//
+	adminAccess,
+	adminRoleEnum,
 	//
 	usersContactInfo,
 	userContactInfoRelations,

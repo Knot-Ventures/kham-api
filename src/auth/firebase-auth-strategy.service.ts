@@ -5,8 +5,7 @@ import {
 	ExtractJwt,
 } from 'passport-firebase-jwt';
 import * as firebase from 'firebase-admin';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { FirebaseService } from 'src/firebase/firebase.service';
+import { FirebaseService } from '../firebase/firebase.service';
 
 @Injectable()
 export class FirebaseAuthStrategy extends PassportStrategy(
@@ -14,10 +13,7 @@ export class FirebaseAuthStrategy extends PassportStrategy(
 ) {
 	private defaultApp: firebase.app.App;
 
-	constructor(
-		private prisma: PrismaService,
-		private firebase: FirebaseService,
-	) {
+	constructor(private firebase: FirebaseService) {
 		super({
 			jwtFromRequest: (request) => {
 				return (
@@ -43,15 +39,8 @@ export class FirebaseAuthStrategy extends PassportStrategy(
 			throw new UnauthorizedException();
 		}
 
-		//TODO Move to Seperate MiddleWare
-		const user = await this.prisma.user
-			.findUnique({
-				where: { firebaseUID: firebaseUser.uid },
-			})
-			.catch((err) => {
-				console.log(err);
-				throw new UnauthorizedException(err.message);
-			});
+		//TODO Get User from Database
+		const user = {};
 
 		console.log({ user });
 		return { data: user, firebaseUser };

@@ -3,6 +3,7 @@ import * as firebase from 'firebase-admin';
 import { Messaging } from 'firebase-admin/messaging';
 import { EmailIdentifier } from 'firebase-admin/auth';
 import axios from 'axios';
+import * as process from 'process';
 
 @Injectable()
 export class FirebaseService {
@@ -33,9 +34,10 @@ export class FirebaseService {
 		this._defaultApp = firebase.initializeApp({
 			credential: firebase.credential.cert(
 				JSON.parse(
-					Buffer.from(process.env.SERVICE_ACCOUNT, 'base64').toString(
-						'utf-8',
-					),
+					Buffer.from(
+						process.env.FIREBASE_SERVICE_ACCOUNT,
+						'base64',
+					).toString('utf-8'),
 				),
 			),
 		});

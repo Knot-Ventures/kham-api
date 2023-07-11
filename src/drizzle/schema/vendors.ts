@@ -1,7 +1,5 @@
 import { pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import products from './products';
-import { catalog_request_items } from './catalog_requests';
 import catalogEntries from './catalog_entries';
 
 const vendors = pgTable('vendors', {

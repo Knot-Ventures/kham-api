@@ -10,7 +10,9 @@ import {
 import { CatalogRequestsService } from './catalog-requests.service';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('catalog-requests')
 @Controller('catalog-requests')
 export class CatalogRequestsController {
 	constructor(
