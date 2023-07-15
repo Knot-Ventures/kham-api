@@ -1,4 +1,3 @@
-// createUser.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 import {
 	ArrayMaxSize,
@@ -10,13 +9,14 @@ import {
 } from 'class-validator';
 import { businessEntityTypeEnum, userTypeEnum } from 'src/drizzle/schema/users';
 
-export class CreateUserDto {
+export class UserDto {
+	@IsNumber()
+	id: number;
+
 	@IsString()
-	@ApiProperty()
 	firstName: string;
 
 	@IsString()
-	@ApiProperty()
 	lastName: string;
 
 	@IsString()
