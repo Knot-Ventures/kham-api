@@ -1,3 +1,4 @@
-import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
+import { InferModel } from 'drizzle-orm';
+import users from '../../../drizzle/schema/users';
 
-export class User {}
+export type User = InferModel<typeof users>;

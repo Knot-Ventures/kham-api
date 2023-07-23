@@ -3,6 +3,6 @@ import { IsString } from 'class-validator';
 
 export class AddFcmTokenDto {
 	@IsString()
-	@ApiProperty()
+	@ApiProperty({ type: String, required: true })
 	token: string;
 }

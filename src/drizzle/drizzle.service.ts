@@ -1,39 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { neonConfig, Pool, neon } from '@neondatabase/serverless';
-// import { drizzle, NeonDatabase } from 'drizzle-orm/neon-serverless';
-import {
-	drizzle,
-	NeonHttpDatabase as NeonDatabase,
-} from 'drizzle-orm/neon-http';
-import * as schema from './schema/schema';
 import { sql } from 'drizzle-orm';
-// import ws from 'ws';
-// neonConfig.webSocketConstructor = ws;
-neonConfig.fetchConnectionCache = true;
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Client } from 'pg';
+import * as schema from './schema/schema';
 
 @Injectable()
 export class DrizzleService {
-	readonly db: NeonDatabase<typeof schema>;
-	private pool: Pool;
+	db;
 	constructor() {
+		this.initialize();
+	}
+
+	async initialize() {
 		const {
 			PGHOST,
 			PGDATABASE,
 			PGUSER,
 			PGPASSWORD,
-			ENDPOINT_ID,
 			PGPORT = '5432',
 		} = process.env;
 
-		const URL = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?options=project%3D${ENDPOINT_ID}`;
+		const connectionString = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
 
 		try {
-			const sqlNeon = neon(URL);
+			// Create a PostgreSQL client and connect to the database
+			const client = new Client({ connectionString });
+			await client.connect();
 
-			this.db = drizzle(sqlNeon, { schema });
-			this.db
-				.execute(sql`select version()`)
-				.then((res) => console.log(res.rows[0]));
+			// Create a Drizzle ORM instance with the client and your schema
+			this.db = drizzle(client, { schema });
+
+			// Test the connection with a query
+			const result = await this.db.execute(sql`SELECT version()`);
+			console.log(result.rows[0].version);
 		} catch (e) {
 			console.error(e);
 		}

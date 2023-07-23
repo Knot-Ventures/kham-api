@@ -8,7 +8,10 @@ import {
 	IsOptional,
 	IsString,
 } from 'class-validator';
-import { businessEntityTypeEnum, userTypeEnum } from 'src/drizzle/schema/users';
+import {
+	businessEntityTypeEnum,
+	userTypeEnum,
+} from '../../../drizzle/schema/users';
 
 export class UpdateUserDto {
 	@IsString()

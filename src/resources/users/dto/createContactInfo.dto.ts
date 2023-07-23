@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
 
-export class UserContactInfoDto {
+export class CreateContactInfoDto {
 	@IsString()
 	@ApiProperty()
 	governorate: string;

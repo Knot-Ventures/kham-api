@@ -1,20 +1,8 @@
-import {
-	pgTable,
-	serial,
-	text,
-	varchar,
-	jsonb,
-	doublePrecision,
-	timestamp,
-	integer,
-	pgEnum,
-} from 'drizzle-orm/pg-core';
-import users_contact_info from './user_contact_info';
-import providers from './providers';
-import seekers from './seekers';
 import { relations } from 'drizzle-orm';
-import catalog_requests from './catalog_requests';
+import { pgEnum, pgTable, serial, text, varchar } from 'drizzle-orm/pg-core';
 import adminAccess from './admin_access';
+import catalog_requests from './catalog_requests';
+import users_contact_info from './user_contact_info';
 
 export const userTypeEnum = pgEnum('user_type', ['individual', 'business']);
 export const businessEntityTypeEnum = pgEnum('business_entity_type', [
@@ -36,6 +24,7 @@ const users = pgTable('users', {
 	),
 	fcmTokens: varchar('fcm_tokens', { length: 256 }).array(),
 	userType: userTypeEnum('user_type'),
+	// isActive: boolean('is_active').default(true),
 	businessType: businessEntityTypeEnum('business_type'),
 	adminAccessId: serial('admin_access_id').references(() => adminAccess.id),
 });

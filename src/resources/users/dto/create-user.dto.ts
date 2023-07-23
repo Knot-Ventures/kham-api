@@ -1,55 +1,62 @@
-// createUser.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
 import {
 	ArrayMaxSize,
 	IsArray,
+	IsBoolean,
 	IsEnum,
 	IsNumber,
 	IsOptional,
 	IsString,
 } from 'class-validator';
-import { businessEntityTypeEnum, userTypeEnum } from 'src/drizzle/schema/users';
+import { businessTypeEnum } from '../shared/businessEntityTypeEnum';
+import { userTypeEnum } from '../shared/userTypeEnum';
 
 export class CreateUserDto {
 	@IsString()
-	@ApiProperty()
+	@ApiProperty({ type: String, required: true })
 	firstName: string;
 
 	@IsString()
-	@ApiProperty()
+	@ApiProperty({ type: String, required: true })
 	lastName: string;
 
 	@IsString()
 	@IsOptional()
-	@ApiProperty()
+	@ApiProperty({ type: String, required: false })
 	profileImage?: string;
 
 	@IsEnum(userTypeEnum)
-	@ApiProperty()
-	userType: 'individual' | 'business';
+	@ApiProperty({ enum: userTypeEnum, required: true })
+	userType: userTypeEnum;
 
-	@IsEnum(businessEntityTypeEnum)
+	@IsEnum(businessTypeEnum)
 	@IsOptional()
-	@ApiProperty()
-	businessType?: 'factory' | 'supplier' | 'restaurant';
+	@ApiProperty({ enum: businessTypeEnum, required: false })
+	businessType?: businessTypeEnum;
 
 	@IsArray()
 	@ArrayMaxSize(256)
 	@IsOptional()
-	@ApiProperty()
+	@ApiProperty({ type: String, isArray: true, required: false })
 	fcmTokens?: string[];
 
 	@IsNumber()
-	@ApiProperty()
-	authId: number;
+	@IsOptional()
+	@ApiProperty({ type: Number, required: false })
+	authId?: number;
 
 	@IsNumber()
 	@IsOptional()
-	@ApiProperty()
+	@ApiProperty({ type: Number, required: false })
 	contactInfoId?: number;
 
 	@IsNumber()
 	@IsOptional()
-	@ApiProperty()
+	@ApiProperty({ type: Number, required: false })
 	adminAccessId?: number;
+
+	@IsBoolean()
+	@IsOptional()
+	@ApiProperty({ type: Boolean, required: false })
+	isActive?: boolean;
 }
