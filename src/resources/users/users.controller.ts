@@ -42,6 +42,7 @@ export class UsersController {
 		return this.usersService.createUser(Data);
 	}
 
+	//add user without contact info and admin access
 	@Post('me')
 	async createOne(@Body() userData: CreateUserDto): Promise<User> {
 		return this.usersService.createOne(userData);
@@ -55,8 +56,21 @@ export class UsersController {
 	@ApiQuery({ name: 'page', required: false, type: Number })
 	@ApiQuery({ name: 'limit', required: false, type: Number })
 	@Get()
-	async findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+	async findAll(
+		@Query('page') page = 1,
+		@Query('limit') limit = 10,
+	): Promise<User[]> {
 		return this.usersService.findAll(page, limit);
+	}
+
+	/**
+	 * Get a user by ID
+	 */
+	@ApiOperation({ summary: 'Get a user by ID' })
+	@ApiOkResponse({ type: UserDto })
+	@Get(':id')
+	async getUserById(@Param('id') id: number) {
+		return this.usersService.findOne(id);
 	}
 
 	/**
@@ -66,15 +80,6 @@ export class UsersController {
 	@Get('me')
 	@ApiOkResponse({ type: User })
 	getMe(@Req() request: Request) {
-		return 'not-implemented';
-	}
-
-	/**
-	 * Authorize Kham/Sales/CSR or the user with same id
-	 */
-	@Get(':uid')
-	@ApiOkResponse({ type: User })
-	findOne(@Param('uid') uid: string) {
 		return 'not-implemented';
 	}
 

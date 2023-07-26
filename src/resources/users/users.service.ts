@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
 import { DrizzleService } from '../../drizzle/drizzle.service';
 import adminAccess from '../../drizzle/schema/admin_access';
 import userContactInfo from '../../drizzle/schema/user_contact_info';
@@ -67,5 +68,15 @@ export class UsersService {
 			.from(users)
 			.limit(limit)
 			.offset(offset);
+	}
+
+	async findOne(userId: number): Promise<any> {
+		return await this.drizzleService.db.query.users.findFirst({
+			where: eq(users.id, userId),
+			with: {
+				contactInfo: true,
+				adminAccess: true,
+			},
+		});
 	}
 }
