@@ -69,18 +69,19 @@ export class UsersController {
 	@ApiOperation({ summary: 'Get a user by ID' })
 	@ApiOkResponse({ type: UserDto })
 	@Get(':id')
-	async getUserById(@Param('id') id: number) {
+	async getUserById(@Param('id') id: number): Promise<User> {
 		return this.usersService.findOne(id);
 	}
 
 	/**
-	 *
-	 * Authorize User and get their data from the authorization response
+	 * Get the current user
 	 */
+	@ApiOperation({ summary: 'Get the current user' })
+	@ApiOkResponse({ type: UserDto })
 	@Get('me')
-	@ApiOkResponse({ type: User })
-	getMe(@Req() request: Request) {
-		return 'not-implemented';
+	async getMe(@Req() request: Request) {
+		//const userId = request.user.id; // assuming the user id is available in the request
+		// return this.usersService.findOne(userId);
 	}
 
 	/**
