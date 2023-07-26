@@ -43,40 +43,103 @@ export class UsersService {
 		} catch (error) {
 			throw new HttpException(
 				{
-					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					error: 'Failed to create user.',
+					status:
+						error.response.status ||
+						HttpStatus.INTERNAL_SERVER_ERROR,
+					error: error.response.error || 'Something went wrong.',
 				},
-				HttpStatus.INTERNAL_SERVER_ERROR,
+				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
 			);
 		}
 	}
 
-	//create user without contact info and admin acess
+	// Create a user without contact info and admin access
 	async createOne(userData: CreateUserDto): Promise<User> {
-		const createdUser = await this.drizzleService.db
-			.insert(users)
-			.values(userData)
-			.returning();
-		return createdUser;
+		try {
+			const createdUser = await this.drizzleService.db
+				.insert(users)
+				.values(userData)
+				.returning();
+
+			if (!createdUser || createdUser.length === 0) {
+				throw new HttpException(
+					{
+						status: HttpStatus.INTERNAL_SERVER_ERROR,
+						error: 'Failed to create user.',
+					},
+					HttpStatus.INTERNAL_SERVER_ERROR,
+				);
+			}
+
+			return createdUser[0];
+		} catch (error) {
+			throw new HttpException(
+				{
+					status:
+						error.response.status ||
+						HttpStatus.INTERNAL_SERVER_ERROR,
+					error: error.response.error || 'Failed to create user.',
+				},
+				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
 	}
 
 	// Find all users with pagination
 	async findAll(page: number, limit: number): Promise<User[]> {
 		const offset = (page - 1) * limit;
-		return this.drizzleService.db
-			.select()
-			.from(users)
-			.limit(limit)
-			.offset(offset);
+
+		try {
+			return this.drizzleService.db
+				.select()
+				.from(users)
+				.limit(limit)
+				.offset(offset);
+		} catch (error) {
+			throw new HttpException(
+				{
+					status:
+						error.response.status ||
+						HttpStatus.INTERNAL_SERVER_ERROR,
+					error: error.response.error || 'Failed to fetch users.',
+				},
+				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
 	}
 
+	// Find a user by ID
 	async findOne(userId: number): Promise<any> {
-		return await this.drizzleService.db.query.users.findFirst({
-			where: eq(users.id, userId),
-			with: {
-				contactInfo: true,
-				adminAccess: true,
-			},
-		});
+		try {
+			const user = await this.drizzleService.db.query.users.findFirst({
+				where: eq(users.id, userId),
+				with: {
+					contactInfo: true,
+					adminAccess: true,
+				},
+			});
+
+			if (!user) {
+				throw new HttpException(
+					{
+						status: HttpStatus.NOT_FOUND,
+						error: 'User not found.',
+					},
+					HttpStatus.NOT_FOUND,
+				);
+			}
+
+			return user;
+		} catch (error) {
+			throw new HttpException(
+				{
+					status:
+						error.response.status ||
+						HttpStatus.INTERNAL_SERVER_ERROR,
+					error: error.response.error || 'Failed to fetch user.',
+				},
+				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
 	}
 }
