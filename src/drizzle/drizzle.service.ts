@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Global, Injectable } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Client } from 'pg';
 import * as schema from './schema/schema';
 
+@Global()
 @Injectable()
 export class DrizzleService {
 	db;
