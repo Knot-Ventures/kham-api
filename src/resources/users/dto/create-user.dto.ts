@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
 	ArrayMaxSize,
 	IsArray,
-	IsBoolean,
 	IsEnum,
 	IsNumber,
 	IsOptional,
@@ -64,8 +63,10 @@ export class CreateUserDto {
 	@ApiProperty({ type: Number, required: false })
 	adminAccessId?: number;
 
-	@IsBoolean()
-	@IsOptional()
-	@ApiProperty({ type: Boolean, required: false })
-	isActive?: boolean;
+	// @IsBoolean()
+	// @IsOptional()
+	// @ApiProperty({ type: Boolean, required: false })
+	// isActive?: boolean;
+
+	name: string;
 }

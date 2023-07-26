@@ -5,8 +5,7 @@ import adminAccess from '../../drizzle/schema/admin_access';
 import userContactInfo from '../../drizzle/schema/user_contact_info';
 import users from '../../drizzle/schema/users';
 import { CreateUserDto } from './dto/create-user.dto';
-import { CreateAdminAccessDto } from './dto/createAdminAccess.dto';
-import { CreateContactInfoDto } from './dto/createContactInfo.dto';
+import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 
 const DEFAULT_CATEGORY_ID = 'default';
@@ -16,14 +15,11 @@ export class UsersService {
 	constructor(private readonly drizzleService: DrizzleService) {}
 
 	// Create a new user
-	async createUser(
-		userData: CreateUserDto,
-		contactInfoData: CreateContactInfoDto,
-		adminAccessData: CreateAdminAccessDto,
-	): Promise<User> {
+	async createUser(Data: UserDto): Promise<User> {
 		try {
 			const createdUser = await this.drizzleService.db.transaction(
 				async (tx) => {
+					const { contactInfoData, adminAccessData, userData } = Data;
 					const contactInfo = await tx
 						.insert(userContactInfo)
 						.values(contactInfoData)
@@ -34,14 +30,14 @@ export class UsersService {
 						.values(adminAccessData)
 						.returning();
 					userData.adminAccessId = Number(userAdminAccess[0].id);
+
 					const user = await tx
 						.insert(users)
 						.values(userData)
 						.returning();
-					return user[0];
+					return user;
 				},
 			);
-
 			return createdUser;
 		} catch (error) {
 			throw new HttpException(
@@ -52,5 +48,13 @@ export class UsersService {
 				HttpStatus.INTERNAL_SERVER_ERROR,
 			);
 		}
+	}
+
+	async createOne(userData: CreateUserDto) {
+		const createdUser = await this.drizzleService.db
+			.insert(users)
+			.values(userData)
+			.returning();
+		return createdUser;
 	}
 }

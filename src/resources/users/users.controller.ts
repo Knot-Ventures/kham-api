@@ -16,14 +16,13 @@ import {
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
-import { CreateAdminAccessDto } from './dto/createAdminAccess.dto';
-import { CreateContactInfoDto } from './dto/createContactInfo.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 
 @ApiTags('users')
@@ -37,16 +36,13 @@ export class UsersController {
 		description: 'The user has been successfully created.',
 	})
 	@Post()
-	async createUser(
-		@Body() userData: CreateUserDto,
-		@Body() contactInfoData: CreateContactInfoDto,
-		@Body() adminAccessData: CreateAdminAccessDto,
-	): Promise<User> {
-		return this.usersService.createUser(
-			userData,
-			contactInfoData,
-			adminAccessData,
-		);
+	async createUser(@Body() Data: UserDto): Promise<User> {
+		return this.usersService.createUser(Data);
+	}
+
+	@Post('me')
+	async createOne(@Body() userData: CreateUserDto): Promise<User> {
+		return this.usersService.createOne(userData);
 	}
 
 	/**
