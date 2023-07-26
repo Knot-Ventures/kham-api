@@ -6,6 +6,7 @@ import {
 	Param,
 	Patch,
 	Post,
+	Query,
 	Req,
 } from '@nestjs/common';
 import {
@@ -13,6 +14,7 @@ import {
 	ApiCreatedResponse,
 	ApiOkResponse,
 	ApiOperation,
+	ApiQuery,
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
@@ -46,14 +48,15 @@ export class UsersController {
 	}
 
 	/**
-	 * Authorize Kham/Sales/CSR
-	 *
-	 * paginate
+	 * Get all users
 	 */
+	@ApiOperation({ summary: 'Get all users' })
+	@ApiOkResponse({ type: UserDto, isArray: true })
+	@ApiQuery({ name: 'page', required: false, type: Number })
+	@ApiQuery({ name: 'limit', required: false, type: Number })
 	@Get()
-	@ApiOkResponse({ type: User, isArray: true })
-	findAll(@Req() request: Request & { user: any }) {
-		return 'not-implemented';
+	async findAll(@Query('page') page = 1, @Query('limit') limit = 10) {
+		return this.usersService.findAll(page, limit);
 	}
 
 	/**

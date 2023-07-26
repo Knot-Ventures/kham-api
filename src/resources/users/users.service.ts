@@ -14,7 +14,7 @@ const DEFAULT_LABEL_ID = 'default';
 export class UsersService {
 	constructor(private readonly drizzleService: DrizzleService) {}
 
-	// Create a new user
+	// Create a new user with contactInfo and Admin Access
 	async createUser(Data: UserDto): Promise<User> {
 		try {
 			const createdUser = await this.drizzleService.db.transaction(
@@ -50,11 +50,22 @@ export class UsersService {
 		}
 	}
 
-	async createOne(userData: CreateUserDto) {
+	//create user without contact info and admin acess
+	async createOne(userData: CreateUserDto): Promise<User> {
 		const createdUser = await this.drizzleService.db
 			.insert(users)
 			.values(userData)
 			.returning();
 		return createdUser;
+	}
+
+	// Find all users with pagination
+	async findAll(page: number, limit: number): Promise<User[]> {
+		const offset = (page - 1) * limit;
+		return this.drizzleService.db
+			.select()
+			.from(users)
+			.limit(limit)
+			.offset(offset);
 	}
 }
