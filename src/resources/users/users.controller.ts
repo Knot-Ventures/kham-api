@@ -32,11 +32,10 @@ import { User } from './entities/user.entity';
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
-	/**
-	 * Create a new user
-	 */
 	@ApiOperation({ summary: 'Create a new user' })
-	@ApiCreatedResponse({ type: CreateUserDto })
+	@ApiCreatedResponse({
+		description: 'The user has been successfully created.',
+	})
 	@Post()
 	async createUser(
 		@Body() userData: CreateUserDto,

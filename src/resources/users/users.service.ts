@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { DrizzleService } from '../../drizzle/drizzle.service';
 import adminAccess from '../../drizzle/schema/admin_access';
 import userContactInfo from '../../drizzle/schema/user_contact_info';
@@ -44,7 +44,13 @@ export class UsersService {
 
 			return createdUser;
 		} catch (error) {
-			throw error;
+			throw new HttpException(
+				{
+					status: HttpStatus.INTERNAL_SERVER_ERROR,
+					error: 'Failed to create user.',
+				},
+				HttpStatus.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
 }
