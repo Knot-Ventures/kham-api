@@ -12,17 +12,19 @@ import {
 	ApiBody,
 	ApiCreatedResponse,
 	ApiOkResponse,
+	ApiOperation,
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
-import { Request } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
-import { User } from './entities/user.entity';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
+import { CreateAdminAccessDto } from './dto/createAdminAccess.dto';
+import { CreateContactInfoDto } from './dto/createContactInfo.dto';
+import { User } from './entities/user.entity';
 
 @ApiTags('users')
 @Controller('users')
@@ -31,13 +33,21 @@ export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
 	/**
-	 * Authorize User
-	 * Create Account
+	 * Create a new user
 	 */
+	@ApiOperation({ summary: 'Create a new user' })
+	@ApiCreatedResponse({ type: CreateUserDto })
 	@Post()
-	@ApiCreatedResponse({ type: User })
-	create(@Body() createUserDto: CreateUserDto) {
-		return 'not-implemented';
+	async createUser(
+		@Body() userData: CreateUserDto,
+		@Body() contactInfoData: CreateContactInfoDto,
+		@Body() adminAccessData: CreateAdminAccessDto,
+	): Promise<User> {
+		return this.usersService.createUser(
+			userData,
+			contactInfoData,
+			adminAccessData,
+		);
 	}
 
 	/**
