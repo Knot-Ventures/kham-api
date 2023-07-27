@@ -1,20 +1,15 @@
+import { relations } from 'drizzle-orm';
 import {
+	boolean,
+	pgEnum,
 	pgTable,
 	serial,
 	text,
 	varchar,
-	jsonb,
-	doublePrecision,
-	timestamp,
-	integer,
-	pgEnum,
 } from 'drizzle-orm/pg-core';
-import users_contact_info from './user_contact_info';
-import providers from './providers';
-import seekers from './seekers';
-import { relations } from 'drizzle-orm';
-import catalog_requests from './catalog_requests';
 import adminAccess from './admin_access';
+import catalog_requests from './catalog_requests';
+import users_contact_info from './user_contact_info';
 
 export const userTypeEnum = pgEnum('user_type', ['individual', 'business']);
 export const businessEntityTypeEnum = pgEnum('business_entity_type', [
@@ -38,6 +33,7 @@ const users = pgTable('users', {
 	userType: userTypeEnum('user_type'),
 	businessType: businessEntityTypeEnum('business_type'),
 	adminAccessId: serial('admin_access_id').references(() => adminAccess.id),
+	isActive: boolean('is_active').notNull().default(true),
 });
 export default users;
 export const usersRelations = relations(users, ({ one, many }) => ({

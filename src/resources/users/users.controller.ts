@@ -129,4 +129,13 @@ export class UsersController {
 	) {
 		return this.usersService.addFcmToken(id, fcmTokenData);
 	}
+
+	/**
+	 * Deactivate a user
+	 */
+	@ApiOperation({ summary: 'Deactivate a user' })
+	@Delete(':id')
+	async deactivateUser(@Param('id') id: number) {
+		return this.usersService.deactivateUser(id);
+	}
 }

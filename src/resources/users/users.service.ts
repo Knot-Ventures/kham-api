@@ -270,4 +270,33 @@ export class UsersService {
 			);
 		}
 	}
+
+	async deactivateUser(id: number) {
+		// Check if the user with the given id exists
+		const userExists = await this.userIdExists(id);
+		try {
+			// Deactivate the user
+			const deactivatedUser = await this.drizzleService.db
+				.update(users)
+				.set({ isActive: false })
+				.where(eq(users.id, id))
+				.returning();
+
+			if (!deactivatedUser[0]) {
+				return 'Failed to deactivate user';
+			}
+
+			return deactivatedUser[0];
+		} catch (error) {
+			throw new HttpException(
+				{
+					status:
+						error.response.status ||
+						HttpStatus.INTERNAL_SERVER_ERROR,
+					error: error.response.error || 'Failed to deActivate user.',
+				},
+				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
 }

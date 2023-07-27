@@ -44,6 +44,6 @@ export class User implements InferModel<typeof users> {
 	@ApiProperty({ type: Number })
 	adminAccessId: number;
 
-	// @ApiProperty({ type: Boolean })
-	// isActive?: boolean;
+	@ApiProperty({ type: Boolean })
+	isActive?: boolean;
 }

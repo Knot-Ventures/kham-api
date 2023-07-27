@@ -63,10 +63,7 @@ export class CreateUserDto {
 	@ApiProperty({ type: Number, required: false })
 	adminAccessId?: number;
 
-	// @IsBoolean()
-	// @IsOptional()
-	// @ApiProperty({ type: Boolean, required: false })
-	// isActive?: boolean;
-
-	name: string;
+	@IsOptional()
+	@ApiProperty({ type: Boolean, required: false })
+	isActive?: boolean;
 }
