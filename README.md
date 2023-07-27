@@ -14,6 +14,7 @@ and fill the variables in the .env file
 $ yarn install
 
 # database Migrations
+$ yarn drizzle:generate # only if needed
 $ yarn drizzle:migrate
 ```
 
