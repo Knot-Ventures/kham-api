@@ -14,32 +14,33 @@ import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
 import { CreateContactInfoDto } from './dto/create-contact-info.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserDto } from './dto/user.dto';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 
-const DEFAULT_CATEGORY_ID = 'default';
-const DEFAULT_LABEL_ID = 'default';
 @Injectable()
 export class UsersService {
 	constructor(private readonly drizzleService: DrizzleService) {}
 
 	// Create a new user with contactInfo and Admin Access
-	async createUser(Data: UserDto): Promise<User> {
+	async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
 		try {
 			const createdUser = await this.drizzleService.db.transaction(
 				async (tx) => {
-					const { contactInfoData, adminAccessData, userData } = Data;
-					const contactInfo = await tx
-						.insert(userContactInfo)
-						.values(contactInfoData)
-						.returning();
-					userData.contactInfoId = Number(contactInfo[0].id);
-					const userAdminAccess = await tx
-						.insert(adminAccess)
-						.values(adminAccessData)
-						.returning();
-					userData.adminAccessId = Number(userAdminAccess[0].id);
-
+					const { contactInfoData, adminAccessData, ...userData } =
+						createUserDto;
+					if (contactInfoData) {
+						const contactInfo = await tx
+							.insert(userContactInfo)
+							.values(contactInfoData)
+							.returning();
+						userData.contactInfoId = Number(contactInfo[0].id);
+					}
+					if (adminAccessData) {
+						const userAdminAccess = await tx
+							.insert(adminAccess)
+							.values(adminAccessData)
+							.returning();
+						userData.adminAccessId = Number(userAdminAccess[0].id);
+					}
 					const user = await tx
 						.insert(users)
 						.values(userData)
@@ -47,7 +48,7 @@ export class UsersService {
 					return user;
 				},
 			);
-			return createdUser;
+			return createdUser[0];
 		} catch (error) {
 			throw new HttpException(
 				{
@@ -62,7 +63,7 @@ export class UsersService {
 	}
 
 	// Create a user without contact info and admin access
-	async createOne(userData: CreateUserDto): Promise<User> {
+	async createOne(userData: CreateUserDto): Promise<UserEntity> {
 		try {
 			const createdUser = await this.drizzleService.db
 				.insert(users)
@@ -94,7 +95,7 @@ export class UsersService {
 	}
 
 	// Find all users with pagination
-	async findAll(page: number, limit: number): Promise<User[]> {
+	async findAll(page: number, limit: number): Promise<UserEntity[]> {
 		const offset = (page - 1) * limit;
 
 		try {
@@ -155,7 +156,11 @@ export class UsersService {
 	async updateUser(id: number, userData: UpdateUserDto) {
 		const userExists = (
 			await this.drizzleService.db
-				.select({ count: sql<number>`count(${users.id})` })
+				.select({
+					count: sql<number>`count(
+                    ${users.id}
+                    )`,
+				})
 				.from(users)
 				.limit(1)
 				.where(eq(users.id, id))
@@ -190,8 +195,9 @@ export class UsersService {
 			);
 		}
 	}
+
 	//check existing user
-	async userIdExists(id: number): Promise<User> {
+	async userIdExists(id: number): Promise<UserEntity> {
 		const existingUser = await this.drizzleService.db
 			.select()
 			.from(users)
@@ -201,7 +207,7 @@ export class UsersService {
 		if (!existingUser[0]) {
 			throw new NotFoundException(`User with ID ${id} not found`);
 		}
-		return existingUser;
+		return existingUser[0];
 	}
 
 	// Add contact information to user

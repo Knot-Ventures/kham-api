@@ -7,43 +7,44 @@ import {
 	IsNumber,
 	IsString,
 } from 'class-validator';
-import { BusinessType, UserType } from './create-user.dto';
+import { BusinessType, UserType } from '../entities/user.entity';
+import { OptionalApiProperty } from '../../../openapi/decorators';
 
 export class UpdateUserDto {
 	@IsString()
-	@ApiProperty()
+	@OptionalApiProperty()
 	firstName?: string;
 
 	@IsString()
-	@ApiProperty()
+	@OptionalApiProperty()
 	lastName?: string;
 
 	@IsString()
-	@ApiProperty()
+	@OptionalApiProperty()
 	profileImage?: string;
 
 	@IsEnum(UserType)
-	@ApiProperty({ enum: UserType, enumName: 'UserType' })
+	@OptionalApiProperty({ enum: UserType, enumName: 'UserType' })
 	userType?: UserType;
 
 	@IsEnum(BusinessType)
-	@ApiProperty({ enum: BusinessType, enumName: 'BusinessType' })
+	@OptionalApiProperty({ enum: BusinessType, enumName: 'BusinessType' })
 	businessType?: BusinessType;
 
 	@IsArray()
 	@ArrayMaxSize(256)
-	@ApiProperty({ type: [String], isArray: true })
+	@OptionalApiProperty({ isArray: true })
 	fcmTokens?: string[];
 
-	@IsNumber()
-	@ApiProperty()
-	authId: number;
+	@IsString()
+	@OptionalApiProperty()
+	authId: string;
 
 	@IsNumber()
-	@ApiProperty()
+	@OptionalApiProperty()
 	contactInfoId?: number;
 
 	@IsNumber()
-	@ApiProperty()
+	@OptionalApiProperty()
 	adminAccessId?: number;
 }

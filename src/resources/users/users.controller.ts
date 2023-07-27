@@ -25,8 +25,7 @@ import { Auth } from '../../auth/decorators/auth.decorator';
 import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
 import { CreateContactInfoDto } from './dto/create-contact-info.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserDto } from './dto/user.dto';
-import { User } from './entities/user.entity';
+import { UserEntity } from './entities/user.entity';
 
 @ApiTags('users')
 @Controller('users')
@@ -39,28 +38,22 @@ export class UsersController {
 		description: 'The user has been successfully created.',
 	})
 	@Post()
-	async createUser(@Body() Data: UserDto): Promise<User> {
-		return this.usersService.createUser(Data);
-	}
-
-	//add user without contact info and admin access
-	@Post('me')
-	async createOne(@Body() userData: CreateUserDto): Promise<User> {
-		return this.usersService.createOne(userData);
+	async createUser(@Body() dto: CreateUserDto): Promise<UserEntity> {
+		return this.usersService.createUser(dto);
 	}
 
 	/**
 	 * Get all users
 	 */
 	@ApiOperation({ summary: 'Get all users' })
-	@ApiOkResponse({ type: UserDto, isArray: true })
+	@ApiOkResponse({ type: UserEntity, isArray: true })
 	@ApiQuery({ name: 'page', required: false, type: Number })
 	@ApiQuery({ name: 'limit', required: false, type: Number })
 	@Get()
 	async findAll(
 		@Query('page') page = 1,
 		@Query('limit') limit = 10,
-	): Promise<User[]> {
+	): Promise<UserEntity[]> {
 		return this.usersService.findAll(page, limit);
 	}
 
@@ -68,9 +61,9 @@ export class UsersController {
 	 * Get a user by ID
 	 */
 	@ApiOperation({ summary: 'Get a user by ID' })
-	@ApiOkResponse({ type: UserDto })
+	@ApiOkResponse({ type: UserEntity })
 	@Get(':id')
-	async getUserById(@Param('id') id: number): Promise<User> {
+	async getUserById(@Param('id') id: number): Promise<UserEntity> {
 		return this.usersService.findOne(id);
 	}
 
@@ -78,7 +71,7 @@ export class UsersController {
 	 * Get the current user
 	 */
 	@ApiOperation({ summary: 'Get the current user' })
-	@ApiOkResponse({ type: UserDto })
+	@ApiOkResponse({ type: UserEntity })
 	@Get('me')
 	async getMe(@Req() request: Request) {
 		//const userId = request.user.id; // assuming the user id is available in the request
@@ -89,19 +82,10 @@ export class UsersController {
 	 * Update a user
 	 */
 	@ApiOperation({ summary: 'Update a user' })
-	@ApiResponse({ type: UserDto })
+	@ApiResponse({ type: UserEntity })
 	@Patch(':id')
 	async updateUser(@Param('id') id: number, @Body() userData: UpdateUserDto) {
 		return this.usersService.updateUser(id, userData);
-	}
-
-	/**
-	 *
-	 * deactivate account only
-	 */
-	@Delete(':uid')
-	delete(@Param('uid') uid: string) {
-		return 'not-implemented';
 	}
 
 	/**
@@ -134,8 +118,8 @@ export class UsersController {
 	 * Deactivate a user
 	 */
 	@ApiOperation({ summary: 'Deactivate a user' })
-	@Delete(':id')
-	async deactivateUser(@Param('id') id: number) {
-		return this.usersService.deactivateUser(id);
+	@Delete(':uid')
+	async deactivateUser(@Param('uid') uid: number) {
+		return this.usersService.deactivateUser(uid);
 	}
 }

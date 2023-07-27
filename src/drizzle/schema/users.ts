@@ -25,7 +25,7 @@ const users = pgTable('users', {
 	firstName: text('first_name'),
 	lastName: text('last_name'),
 	profileImage: varchar('profile_image', { length: 256 }),
-	authId: serial('auth_id').notNull(),
+	authId: varchar('auth_id', { length: 256 }).notNull(),
 	contactInfoId: serial('contact_info_id').references(
 		() => users_contact_info.id,
 	),

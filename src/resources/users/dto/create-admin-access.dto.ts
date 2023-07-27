@@ -1,11 +1,5 @@
 import { IsEnum } from 'class-validator';
-
-export enum AdminRole {
-	Administrator = 'administrator',
-	CustomerService = 'customer_service',
-	Sales = 'sales',
-	Other = 'other',
-}
+import { AdminRole } from '../entities/admin-access.entity';
 
 export class CreateAdminAccessDto {
 	@IsEnum(AdminRole)

@@ -1,29 +1,40 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { InferModel } from 'drizzle-orm';
 import users from '../../../drizzle/schema/users';
+import { EnumTypeFromMap } from '../../../helpers/EnumTypeFromMap';
+import { UserContactInfoEntity } from './contact-info.entity';
+import { OptionalApiProperty } from '../../../openapi/decorators';
+import { AdminAccessEntity } from './admin-access.entity';
 
-enum UserType {
-	Individual = 'individual',
-	Business = 'business',
-}
+export const UserType = {
+	Individual: 'individual',
+	Business: 'business',
+} as const;
 
-enum BusinessType {
-	Factory = 'factory',
-	Supplier = 'supplier',
-	Restaurant = 'restaurant',
-}
+export type UserType = EnumTypeFromMap<typeof UserType>;
 
-export class User implements InferModel<typeof users> {
-	@ApiProperty({ type: Number })
+export const BusinessType = {
+	Factory: 'factory',
+	Supplier: 'supplier',
+	Restaurant: 'restaurant',
+} as const;
+export type BusinessType = EnumTypeFromMap<typeof BusinessType>;
+
+export type UserModel = InferModel<typeof users>;
+
+export class UserEntity
+	implements Partial<UserModel & { userContactInfo: UserContactInfoEntity }>
+{
+	@ApiProperty()
 	id: number;
 
-	@ApiProperty({ type: String })
+	@ApiProperty()
 	firstName: string;
 
-	@ApiProperty({ type: String })
+	@ApiProperty()
 	lastName: string;
 
-	@ApiProperty({ type: String })
+	@ApiProperty()
 	profileImage: string;
 
 	@ApiProperty({ enum: UserType })
@@ -32,18 +43,24 @@ export class User implements InferModel<typeof users> {
 	@ApiProperty({ enum: BusinessType })
 	businessType: BusinessType;
 
-	@ApiProperty({ type: [String], isArray: true })
+	@ApiProperty({ isArray: true })
 	fcmTokens: string[];
 
-	@ApiProperty({ type: Number })
-	authId: number;
+	@ApiProperty()
+	authId: string;
 
-	@ApiProperty({ type: Number })
+	@ApiProperty()
 	contactInfoId: number;
 
-	@ApiProperty({ type: Number })
+	@OptionalApiProperty({ type: () => UserContactInfoEntity })
+	contactInfo?: UserContactInfoEntity;
+
+	@ApiProperty()
 	adminAccessId: number;
 
-	@ApiProperty({ type: Boolean })
-	isActive?: boolean;
+	@OptionalApiProperty({ type: () => AdminAccessEntity })
+	adminAccess?: AdminAccessEntity;
+
+	@ApiProperty()
+	isActive: boolean;
 }

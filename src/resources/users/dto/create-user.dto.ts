@@ -1,24 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import {
 	ArrayMaxSize,
 	IsArray,
 	IsEnum,
 	IsNumber,
-	IsOptional,
 	IsString,
 } from 'class-validator';
+import { CreateContactInfoDto } from './create-contact-info.dto';
+import { CreateAdminAccessDto } from './create-admin-access.dto';
+import { OptionalApiProperty } from '../../../openapi/decorators';
+import { BusinessType, UserType } from '../entities/user.entity';
 
-export enum UserType {
-	Individual = 'individual',
-	Business = 'business',
-}
-
-export enum BusinessType {
-	Factory = 'factory',
-	Supplier = 'supplier',
-	Restaurant = 'restaurant',
-}
-
+@ApiExtraModels(CreateAdminAccessDto, CreateContactInfoDto)
 export class CreateUserDto {
 	@IsString()
 	@ApiProperty()
@@ -29,8 +22,7 @@ export class CreateUserDto {
 	lastName: string;
 
 	@IsString()
-	@IsOptional()
-	@ApiProperty({ required: false })
+	@OptionalApiProperty()
 	profileImage?: string;
 
 	@IsEnum(UserType)
@@ -38,32 +30,32 @@ export class CreateUserDto {
 	userType: UserType;
 
 	@IsEnum(BusinessType)
-	@IsOptional()
-	@ApiProperty({ enum: BusinessType, required: false })
+	@OptionalApiProperty({ enum: BusinessType })
 	businessType?: BusinessType;
 
 	@IsArray()
 	@ArrayMaxSize(256)
-	@IsOptional()
-	@ApiProperty({ type: [String], required: false })
+	@OptionalApiProperty({ isArray: true })
 	fcmTokens?: string[];
 
-	@IsNumber()
-	@IsOptional()
-	@ApiProperty({ type: Number, required: false })
-	authId?: number;
+	@IsString()
+	@ApiProperty()
+	authId: string;
 
 	@IsNumber()
-	@IsOptional()
-	@ApiProperty({ type: Number, required: false })
+	@OptionalApiProperty()
 	contactInfoId?: number;
 
 	@IsNumber()
-	@IsOptional()
-	@ApiProperty({ type: Number, required: false })
+	@OptionalApiProperty()
 	adminAccessId?: number;
 
-	@IsOptional()
-	@ApiProperty({ type: Boolean, required: false })
+	@OptionalApiProperty()
 	isActive?: boolean;
+
+	@OptionalApiProperty({ type: () => CreateContactInfoDto })
+	contactInfoData?: CreateContactInfoDto;
+
+	@OptionalApiProperty({ type: () => CreateAdminAccessDto })
+	adminAccessData?: CreateAdminAccessDto;
 }
