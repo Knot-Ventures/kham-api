@@ -1,11 +1,17 @@
 /* eslint-disable prettier/prettier */
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import {
+	HttpException,
+	HttpStatus,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
+import { eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '../../drizzle/drizzle.service';
 import adminAccess from '../../drizzle/schema/admin_access';
 import userContactInfo from '../../drizzle/schema/user_contact_info';
 import users from '../../drizzle/schema/users';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 
@@ -137,6 +143,47 @@ export class UsersService {
 						error.response.status ||
 						HttpStatus.INTERNAL_SERVER_ERROR,
 					error: error.response.error || 'Failed to fetch user.',
+				},
+				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	// Update user data
+	async updateUser(id: number, userData: UpdateUserDto) {
+		const userExists = (
+			await this.drizzleService.db
+				.select({ count: sql<number>`count(${users.id})` })
+				.from(users)
+				.limit(1)
+				.where(eq(users.id, id))
+		)?.[0]?.count;
+		if (userExists <= 0) {
+			throw new NotFoundException(`User with ID ${id} not found`);
+		}
+
+		try {
+			// Update the user's data
+			const updatedUser = await this.drizzleService.db
+				.update(users)
+				.set(userData)
+				.where(eq(users.id, id))
+				.returning();
+
+			if (!updatedUser[0]) {
+				throw new Error('Failed to update user');
+			}
+
+			return updatedUser[0];
+		} catch (error) {
+			console.log(error);
+			throw new HttpException(
+				{
+					status:
+						error.response.status ||
+						HttpStatus.INTERNAL_SERVER_ERROR,
+					error:
+						error.response.error || 'Failed to update user data.',
 				},
 				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
 			);

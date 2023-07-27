@@ -85,13 +85,13 @@ export class UsersController {
 	}
 
 	/**
-	 * Authorize the user with same id
-	 * and edit their profile
+	 * Update a user
 	 */
-	@Patch(':uid')
-	@ApiResponse({ type: User })
-	update(@Param('uid') uid: string, @Body() updateUserDto: UpdateUserDto) {
-		return 'not-implemented';
+	@ApiOperation({ summary: 'Update a user' })
+	@ApiResponse({ type: UserDto })
+	@Patch(':id')
+	async updateUser(@Param('id') id: number, @Body() userData: UpdateUserDto) {
+		return this.usersService.updateUser(id, userData);
 	}
 
 	/**
