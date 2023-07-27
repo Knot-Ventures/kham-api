@@ -1,15 +1,19 @@
 import { Global, Injectable } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Client } from 'pg';
 import * as schema from './schema/schema';
+import * as process from 'process';
 
 @Global()
 @Injectable()
 export class DrizzleService {
-	db;
+	db: NodePgDatabase<typeof schema>;
+	private isInitialized = false;
 	constructor() {
-		this.initialize();
+		this.initialize().then(() => {
+			this.isInitialized = true;
+		});
 	}
 
 	async initialize() {
@@ -21,11 +25,12 @@ export class DrizzleService {
 			PGPORT = '5432',
 		} = process.env;
 
-		const connectionString = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}`;
-
+		const connectionString = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=prefer`;
 		try {
-			// Create a PostgreSQL client and connect to the database
-			const client = new Client({ connectionString });
+			// Create a client and connect to the database
+			const client = new Client({
+				connectionString,
+			});
 			await client.connect();
 
 			// Create a Drizzle ORM instance with the client and your schema
