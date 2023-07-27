@@ -1,7 +1,7 @@
-import { jsonb, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 const catalogRequestContactInfo = pgTable('catalog_request_contact_info', {
-	id: serial('id').primaryKey(),
+	id: uuid('id').defaultRandom().primaryKey(),
 	governorate: text('governorate'),
 	city: text('city'),
 	address: text('address'),

@@ -42,9 +42,9 @@ export class UpdateUserDto {
 
 	@IsNumber()
 	@OptionalApiProperty()
-	contactInfoId?: number;
+	contactInfoId?: string;
 
 	@IsNumber()
 	@OptionalApiProperty()
-	adminAccessId?: number;
+	adminAccessId?: string;
 }

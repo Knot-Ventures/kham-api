@@ -1,15 +1,15 @@
-import { doublePrecision, pgTable, serial } from 'drizzle-orm/pg-core';
+import { doublePrecision, pgTable, uuid } from 'drizzle-orm/pg-core';
 import catalog_entries from './catalog_entries';
-import { relations } from 'drizzle-orm';
 import catalogEntries from './catalog_entries';
+import { relations } from 'drizzle-orm';
 import catalogRequests from './catalog_requests';
 
 const catalogRequestItems = pgTable('catalog_request_items', {
-	id: serial('id').primaryKey(),
-	catalog_entry_id: serial('catalog_entry_id').references(
+	id: uuid('id').defaultRandom().primaryKey(),
+	catalog_entry_id: uuid('catalog_entry_id').references(
 		() => catalog_entries.id,
 	),
-	catalog_request_id: serial('catalog_request_id').references(
+	catalog_request_id: uuid('catalog_request_id').references(
 		() => catalogRequests.id,
 	),
 	quantity: doublePrecision('quantity'),

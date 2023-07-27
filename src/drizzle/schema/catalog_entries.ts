@@ -1,26 +1,21 @@
 import {
 	doublePrecision,
 	pgTable,
-	serial,
 	text,
+	uuid,
 	varchar,
 } from 'drizzle-orm/pg-core';
 import products from './products';
 import vendors from './vendors';
 import { relations } from 'drizzle-orm';
-import seekers from './seekers';
-import providers from './providers';
-import users_contact_info from './user_contact_info';
-import catalog_requests from './catalog_requests';
 import catalog_request_items from './catalog_request_items';
-import users from './users';
 
 const catalogEntries = pgTable('catalog_entries', {
-	id: serial('id').primaryKey(),
-	productId: serial('product_id')
+	id: uuid('id').defaultRandom().primaryKey(),
+	productId: uuid('product_id')
 		.notNull()
 		.references(() => products.id),
-	vendorId: serial('vendor_id')
+	vendorId: uuid('vendor_id')
 		.notNull()
 		.references(() => vendors.id),
 	description: text('description'),

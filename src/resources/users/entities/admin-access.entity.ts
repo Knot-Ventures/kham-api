@@ -16,7 +16,7 @@ export type AdminAccessModel = InferModel<typeof adminAccess>;
 
 export class AdminAccessEntity implements AdminAccessModel {
 	@ApiProperty()
-	id: number;
+	id: string;
 	@ApiProperty({ enum: AdminRole })
 	role: AdminRole;
 	@ApiProperty()

@@ -1,20 +1,4 @@
-import {
-	pgTable,
-	serial,
-	text,
-	varchar,
-	jsonb,
-	doublePrecision,
-	timestamp,
-	integer,
-	pgEnum,
-} from 'drizzle-orm/pg-core';
-import users_contact_info from './user_contact_info';
-import providers from './providers';
-import seekers from './seekers';
-import { relations } from 'drizzle-orm';
-import catalog_requests from './catalog_requests';
-import users from './users';
+import { jsonb, pgEnum, pgTable, uuid } from 'drizzle-orm/pg-core';
 
 export const adminRoleEnum = pgEnum('admin_role', [
 	'administrator',
@@ -24,7 +8,7 @@ export const adminRoleEnum = pgEnum('admin_role', [
 ]);
 
 const adminAccess = pgTable('admin_access', {
-	id: serial('id').primaryKey(),
+	id: uuid('id').defaultRandom().primaryKey(),
 	role: adminRoleEnum('user_type'),
 	permissions: jsonb('permissions'),
 });

@@ -1,13 +1,11 @@
 import {
-	foreignKey,
 	integer,
 	jsonb,
 	pgEnum,
 	pgTable,
-	serial,
 	text,
 	timestamp,
-	varchar,
+	uuid,
 } from 'drizzle-orm/pg-core';
 import users from './users';
 import { relations } from 'drizzle-orm';
@@ -24,11 +22,11 @@ export const catalogRequestStatusEnum = pgEnum('catalog_requests_status', [
 	'parked',
 ]);
 const catalogRequests = pgTable('catalog_requests', {
-	id: serial('id').primaryKey(),
-	userId: serial('user_id')
+	id: uuid('id').defaultRandom().primaryKey(),
+	userId: uuid('user_id')
 		.references(() => users.id)
 		.notNull(),
-	requestContactInfoId: serial('request_contact_info_id').references(
+	requestContactInfoId: uuid('request_contact_info_id').references(
 		() => catalogRequestContactInfo.id,
 	),
 	itemCount: integer('item_count'),

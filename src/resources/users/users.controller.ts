@@ -63,7 +63,7 @@ export class UsersController {
 	@ApiOperation({ summary: 'Get a user by ID' })
 	@ApiOkResponse({ type: UserEntity })
 	@Get(':id')
-	async getUserById(@Param('id') id: number): Promise<UserEntity> {
+	async getUserById(@Param('id') id: string): Promise<UserEntity> {
 		return this.usersService.findOne(id);
 	}
 
@@ -84,7 +84,7 @@ export class UsersController {
 	@ApiOperation({ summary: 'Update a user' })
 	@ApiResponse({ type: UserEntity })
 	@Patch(':id')
-	async updateUser(@Param('id') id: number, @Body() userData: UpdateUserDto) {
+	async updateUser(@Param('id') id: string, @Body() userData: UpdateUserDto) {
 		return this.usersService.updateUser(id, userData);
 	}
 
@@ -95,7 +95,7 @@ export class UsersController {
 	@ApiBody({ type: CreateContactInfoDto })
 	@Patch(':id/contact-info')
 	async updateContactInfo(
-		@Param('id') id: number,
+		@Param('id') id: string,
 		@Body() contactInfoDto: CreateContactInfoDto,
 	) {
 		return await this.usersService.addUserContactInfo(id, contactInfoDto);
@@ -108,7 +108,7 @@ export class UsersController {
 	@ApiBody({ type: AddFcmTokenDto })
 	@Post(':id/fcm-tokens')
 	async addFcmToken(
-		@Param('id') id: number,
+		@Param('id') id: string,
 		@Body() fcmTokenData: AddFcmTokenDto,
 	) {
 		return this.usersService.addFcmToken(id, fcmTokenData);
@@ -119,7 +119,7 @@ export class UsersController {
 	 */
 	@ApiOperation({ summary: 'Deactivate a user' })
 	@Delete(':uid')
-	async deactivateUser(@Param('uid') uid: number) {
+	async deactivateUser(@Param('uid') uid: string) {
 		return this.usersService.deactivateUser(uid);
 	}
 }

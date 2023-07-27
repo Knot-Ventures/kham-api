@@ -1,9 +1,9 @@
-import { boolean, jsonb, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { boolean, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import users from './users';
 
 const userContactInfo = pgTable('user_contact_info', {
-	id: serial('id').primaryKey(),
+	id: uuid('id').defaultRandom().primaryKey(),
 	governorate: text('governorate'),
 	city: text('city'),
 	address: text('address'),

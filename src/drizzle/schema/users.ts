@@ -1,10 +1,11 @@
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
+	bigint,
 	boolean,
 	pgEnum,
 	pgTable,
-	serial,
 	text,
+	uuid,
 	varchar,
 } from 'drizzle-orm/pg-core';
 import adminAccess from './admin_access';
@@ -19,20 +20,20 @@ export const businessEntityTypeEnum = pgEnum('business_entity_type', [
 ]);
 
 const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	// seekerId: serial('seeker_id').references(() => seekers.id),
-	// providerId: serial('provider_id').references(() => providers.id),
+	id: uuid('id').defaultRandom().primaryKey(),
+	// seekerId: uuid('seeker_id', ).references(() => seekers.id),
+	// providerId: uuid('provider_id', ).references(() => providers.id),
 	firstName: text('first_name'),
 	lastName: text('last_name'),
 	profileImage: varchar('profile_image', { length: 256 }),
 	authId: varchar('auth_id', { length: 256 }).notNull(),
-	contactInfoId: serial('contact_info_id').references(
+	contactInfoId: uuid('contact_info_id').references(
 		() => users_contact_info.id,
 	),
 	fcmTokens: varchar('fcm_tokens', { length: 256 }).array(),
 	userType: userTypeEnum('user_type'),
 	businessType: businessEntityTypeEnum('business_type'),
-	adminAccessId: serial('admin_access_id').references(() => adminAccess.id),
+	adminAccessId: uuid('admin_access_id').references(() => adminAccess.id),
 	isActive: boolean('is_active').notNull().default(true),
 });
 export default users;

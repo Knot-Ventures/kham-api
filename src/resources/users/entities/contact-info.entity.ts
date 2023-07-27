@@ -22,7 +22,7 @@ export class UserContactInfoEntity implements UserContactInfoModel {
 	@OptionalApiProperty()
 	phoneNumber: string;
 	@ApiProperty()
-	id: number;
+	id: string;
 	@OptionalApiProperty()
 	city: string;
 	@OptionalApiProperty()

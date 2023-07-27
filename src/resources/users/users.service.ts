@@ -32,14 +32,14 @@ export class UsersService {
 							.insert(userContactInfo)
 							.values(contactInfoData)
 							.returning();
-						userData.contactInfoId = Number(contactInfo[0].id);
+						userData.contactInfoId = contactInfo[0].id;
 					}
 					if (adminAccessData) {
 						const userAdminAccess = await tx
 							.insert(adminAccess)
 							.values(adminAccessData)
 							.returning();
-						userData.adminAccessId = Number(userAdminAccess[0].id);
+						userData.adminAccessId = userAdminAccess[0].id;
 					}
 					const user = await tx
 						.insert(users)
@@ -118,7 +118,7 @@ export class UsersService {
 	}
 
 	// Find a user by ID (with his contact info and admin access)
-	async findOne(userId: number): Promise<any> {
+	async findOne(userId: string): Promise<any> {
 		try {
 			const user = await this.drizzleService.db.query.users.findFirst({
 				where: eq(users.id, userId),
@@ -153,7 +153,7 @@ export class UsersService {
 	}
 
 	// Update user data
-	async updateUser(id: number, userData: UpdateUserDto) {
+	async updateUser(id: string, userData: UpdateUserDto) {
 		const userExists = (
 			await this.drizzleService.db
 				.select({
@@ -197,7 +197,7 @@ export class UsersService {
 	}
 
 	//check existing user
-	async userIdExists(id: number): Promise<UserEntity> {
+	async userIdExists(id: string): Promise<UserEntity> {
 		const existingUser = await this.drizzleService.db
 			.select()
 			.from(users)
@@ -211,7 +211,7 @@ export class UsersService {
 	}
 
 	// Add contact information to user
-	async addUserContactInfo(id: number, contactInfoDto: CreateContactInfoDto) {
+	async addUserContactInfo(id: string, contactInfoDto: CreateContactInfoDto) {
 		const existingUser = await this.userIdExists(id);
 		const contactInfoId = existingUser[0].contactInfoId;
 		try {
@@ -243,7 +243,7 @@ export class UsersService {
 	}
 
 	// Add FCM token
-	async addFcmToken(id: number, fcmTokenData: AddFcmTokenDto) {
+	async addFcmToken(id: string, fcmTokenData: AddFcmTokenDto) {
 		const existingUser = await this.userIdExists(id);
 		try {
 			const updatedUser = await this.drizzleService.db
@@ -277,7 +277,7 @@ export class UsersService {
 		}
 	}
 
-	async deactivateUser(id: number) {
+	async deactivateUser(id: string) {
 		// Check if the user with the given id exists
 		const userExists = await this.userIdExists(id);
 		try {

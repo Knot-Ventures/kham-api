@@ -1,28 +1,57 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "8428482e-878d-4d3d-822b-decd374f5959",
+  "id": "77cc5db6-0405-42a0-a655-ffa2d8551b36",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "admin_access": {
+      "name": "admin_access",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_type": {
+          "name": "user_type",
+          "type": "admin_role",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "permissions": {
+          "name": "permissions",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {}
+    },
     "catalog_entries": {
       "name": "catalog_entries",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "product_id": {
           "name": "product_id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "vendor_id": {
           "name": "vendor_id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
@@ -112,9 +141,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "governorate": {
           "name": "governorate",
@@ -163,21 +193,22 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "catalog_entry_id": {
           "name": "catalog_entry_id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "catalog_request_id": {
           "name": "catalog_request_id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "quantity": {
           "name": "quantity",
@@ -223,21 +254,22 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "user_id": {
           "name": "user_id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "request_contact_info_id": {
           "name": "request_contact_info_id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "item_count": {
           "name": "item_count",
@@ -319,9 +351,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "name": {
           "name": "name",
@@ -358,9 +391,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "first_name": {
           "name": "first_name",
@@ -382,15 +416,15 @@
         },
         "auth_id": {
           "name": "auth_id",
-          "type": "serial",
+          "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
         },
         "contact_info_id": {
           "name": "contact_info_id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "fcm_tokens": {
           "name": "fcm_tokens",
@@ -409,6 +443,19 @@
           "type": "business_entity_type",
           "primaryKey": false,
           "notNull": false
+        },
+        "admin_access_id": {
+          "name": "admin_access_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
         }
       },
       "indexes": {},
@@ -425,6 +472,19 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "users_admin_access_id_admin_access_id_fk": {
+          "name": "users_admin_access_id_admin_access_id_fk",
+          "tableFrom": "users",
+          "tableTo": "admin_access",
+          "columnsFrom": [
+            "admin_access_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {}
@@ -435,9 +495,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "governorate": {
           "name": "governorate",
@@ -493,9 +554,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "name": {
           "name": "name",
@@ -522,6 +584,15 @@
     }
   },
   "enums": {
+    "admin_role": {
+      "name": "admin_role",
+      "values": {
+        "administrator": "administrator",
+        "customer_service": "customer_service",
+        "sales": "sales",
+        "other": "other"
+      }
+    },
     "business_entity_type": {
       "name": "business_entity_type",
       "values": {
@@ -533,9 +604,11 @@
     "catalog_requests_status": {
       "name": "catalog_requests_status",
       "values": {
+        "fulfilled": "fulfilled",
         "accepted": "accepted",
         "rejected": "rejected",
         "canceled": "canceled",
+        "voided": "voided",
         "pending_response": "pending_response",
         "parked": "parked"
       }

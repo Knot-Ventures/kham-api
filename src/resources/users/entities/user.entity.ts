@@ -26,7 +26,7 @@ export class UserEntity
 	implements Partial<UserModel & { userContactInfo: UserContactInfoEntity }>
 {
 	@ApiProperty()
-	id: number;
+	id: string;
 
 	@ApiProperty()
 	firstName: string;
@@ -50,13 +50,13 @@ export class UserEntity
 	authId: string;
 
 	@ApiProperty()
-	contactInfoId: number;
+	contactInfoId: string;
 
 	@OptionalApiProperty({ type: () => UserContactInfoEntity })
 	contactInfo?: UserContactInfoEntity;
 
 	@ApiProperty()
-	adminAccessId: number;
+	adminAccessId: string;
 
 	@OptionalApiProperty({ type: () => AdminAccessEntity })
 	adminAccess?: AdminAccessEntity;

@@ -1,11 +1,17 @@
 DO $$ BEGIN
+ CREATE TYPE "admin_role" AS ENUM('administrator', 'customer_service', 'sales', 'other');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "business_entity_type" AS ENUM('factory', 'supplier', 'restaurant');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "catalog_requests_status" AS ENUM('accepted', 'rejected', 'canceled', 'pending_response', 'parked');
+ CREATE TYPE "catalog_requests_status" AS ENUM('fulfilled', 'accepted', 'rejected', 'canceled', 'voided', 'pending_response', 'parked');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -16,10 +22,16 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "admin_access" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_type" "admin_role",
+	"permissions" jsonb
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "catalog_entries" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"product_id" serial NOT NULL,
-	"vendor_id" serial NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"product_id" uuid NOT NULL,
+	"vendor_id" uuid NOT NULL,
 	"description" text,
 	"images" varchar(256)[],
 	"title" varchar(256),
@@ -31,7 +43,7 @@ CREATE TABLE IF NOT EXISTS "catalog_entries" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "catalog_request_contact_info" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"governorate" text,
 	"city" text,
 	"address" text,
@@ -41,16 +53,16 @@ CREATE TABLE IF NOT EXISTS "catalog_request_contact_info" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "catalog_request_items" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"catalog_entry_id" serial NOT NULL,
-	"catalog_request_id" serial NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"catalog_entry_id" uuid,
+	"catalog_request_id" uuid,
 	"quantity" double precision
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "catalog_requests" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" serial NOT NULL,
-	"request_contact_info_id" serial NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"request_contact_info_id" uuid,
 	"item_count" integer,
 	"created_at" timestamp,
 	"submitted_at" timestamp,
@@ -61,7 +73,7 @@ CREATE TABLE IF NOT EXISTS "catalog_requests" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "products" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(256),
 	"e_number" varchar(6),
 	"other_names" text,
@@ -69,19 +81,21 @@ CREATE TABLE IF NOT EXISTS "products" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"first_name" text,
 	"last_name" text,
 	"profile_image" varchar(256),
-	"auth_id" serial NOT NULL,
-	"contact_info_id" serial NOT NULL,
+	"auth_id" varchar(256) NOT NULL,
+	"contact_info_id" uuid,
 	"fcm_tokens" varchar(256)[],
 	"user_type" "user_type",
-	"business_type" "business_entity_type"
+	"business_type" "business_entity_type",
+	"admin_access_id" uuid,
+	"is_active" boolean DEFAULT true NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_contact_info" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"governorate" text,
 	"city" text,
 	"address" text,
@@ -92,7 +106,7 @@ CREATE TABLE IF NOT EXISTS "user_contact_info" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "vendors" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(256),
 	"address" text,
 	"image" varchar(256)
@@ -136,6 +150,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "users" ADD CONSTRAINT "users_contact_info_id_user_contact_info_id_fk" FOREIGN KEY ("contact_info_id") REFERENCES "user_contact_info"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "users" ADD CONSTRAINT "users_admin_access_id_admin_access_id_fk" FOREIGN KEY ("admin_access_id") REFERENCES "admin_access"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

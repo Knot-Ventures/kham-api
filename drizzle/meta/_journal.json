@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1688637953545,
-      "tag": "0000_yummy_jubilee",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1689072680480,
-      "tag": "0001_glossy_ted_forrester",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1690456913435,
-      "tag": "0002_sloppy_reaper",
+      "when": 1690469687862,
+      "tag": "0000_flaky_joystick",
       "breakpoints": true
     }
   ]

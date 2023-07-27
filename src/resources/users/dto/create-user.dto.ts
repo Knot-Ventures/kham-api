@@ -44,11 +44,11 @@ export class CreateUserDto {
 
 	@IsNumber()
 	@OptionalApiProperty()
-	contactInfoId?: number;
+	contactInfoId?: string;
 
 	@IsNumber()
 	@OptionalApiProperty()
-	adminAccessId?: number;
+	adminAccessId?: string;
 
 	@OptionalApiProperty()
 	isActive?: boolean;
