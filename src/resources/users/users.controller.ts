@@ -118,13 +118,15 @@ export class UsersController {
 	}
 
 	/**
-	 * add and FirebaseMessaging token to their profile
+	 * Add a Firebase Messaging token to user's profile
 	 */
+	@ApiOperation({ summary: 'Add a Firebase Messaging token to user profile' })
 	@ApiBody({ type: AddFcmTokenDto })
-	@Post(':uid/fcm-token')
-	addFcmToken(@Param('uid') uid: string, @Body('token') token: string) {
-		return 'not-implemented';
+	@Post(':id/fcm-tokens')
+	async addFcmToken(
+		@Param('id') id: number,
+		@Body() fcmTokenData: AddFcmTokenDto,
+	) {
+		return this.usersService.addFcmToken(id, fcmTokenData);
 	}
-
-	//#endregion
 }

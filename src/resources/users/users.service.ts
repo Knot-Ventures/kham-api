@@ -10,6 +10,7 @@ import { DrizzleService } from '../../drizzle/drizzle.service';
 import adminAccess from '../../drizzle/schema/admin_access';
 import userContactInfo from '../../drizzle/schema/user_contact_info';
 import users from '../../drizzle/schema/users';
+import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
 import { CreateContactInfoDto } from './dto/create-contact-info.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -208,7 +209,7 @@ export class UsersService {
 		const existingUser = await this.userIdExists(id);
 		const contactInfoId = existingUser[0].contactInfoId;
 		try {
-			// Update contact info from userContactInfo table
+			// Update contact info *from userContactInfo table
 			const updatedUser = await this.drizzleService.db
 				.update(userContactInfo)
 				.set(contactInfoDto)
@@ -229,6 +230,41 @@ export class UsersService {
 					error:
 						error.response.error ||
 						'Failed to update user contact info',
+				},
+				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	// Add FCM token
+	async addFcmToken(id: number, fcmTokenData: AddFcmTokenDto) {
+		const existingUser = await this.userIdExists(id);
+		try {
+			const updatedUser = await this.drizzleService.db
+				.update(users)
+				.set({
+					fcmTokens: [
+						...existingUser[0].fcmTokens,
+						fcmTokenData.token,
+					],
+				})
+				// .set({
+				// 	fcmTokens: sql`ARRAY_APPEND(${users.fcmTokens}, '${fcmTokenData.token}')`,
+				// })not working
+				.where(eq(users.id, id))
+				.returning();
+			if (!updatedUser[0]) {
+				return 'Failed to add user FCM token';
+			}
+
+			return updatedUser[0];
+		} catch (error) {
+			throw new HttpException(
+				{
+					status:
+						error.response.status ||
+						HttpStatus.INTERNAL_SERVER_ERROR,
+					error: error.response.error || 'Failed to add fcm token.',
 				},
 				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
 			);
