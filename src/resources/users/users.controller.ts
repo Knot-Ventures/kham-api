@@ -6,23 +6,27 @@ import {
 	Param,
 	Patch,
 	Post,
+	Query,
 	Req,
 } from '@nestjs/common';
 import {
 	ApiBody,
 	ApiCreatedResponse,
 	ApiOkResponse,
+	ApiOperation,
+	ApiQuery,
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
-import { Request } from 'express';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
-import { User } from './entities/user.entity';
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
+import { CreateContactInfoDto } from './dto/create-contact-info.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserDto } from './dto/user.dto';
+import { User } from './entities/user.entity';
 
 @ApiTags('users')
 @Controller('users')
@@ -30,54 +34,65 @@ import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
-	/**
-	 * Authorize User
-	 * Create Account
-	 */
+	@ApiOperation({ summary: 'Create a new user' })
+	@ApiCreatedResponse({
+		description: 'The user has been successfully created.',
+	})
 	@Post()
-	@ApiCreatedResponse({ type: User })
-	create(@Body() createUserDto: CreateUserDto) {
-		return 'not-implemented';
+	async createUser(@Body() Data: UserDto): Promise<User> {
+		return this.usersService.createUser(Data);
+	}
+
+	//add user without contact info and admin access
+	@Post('me')
+	async createOne(@Body() userData: CreateUserDto): Promise<User> {
+		return this.usersService.createOne(userData);
 	}
 
 	/**
-	 * Authorize Kham/Sales/CSR
-	 *
-	 * paginate
+	 * Get all users
 	 */
+	@ApiOperation({ summary: 'Get all users' })
+	@ApiOkResponse({ type: UserDto, isArray: true })
+	@ApiQuery({ name: 'page', required: false, type: Number })
+	@ApiQuery({ name: 'limit', required: false, type: Number })
 	@Get()
-	@ApiOkResponse({ type: User, isArray: true })
-	findAll(@Req() request: Request & { user: any }) {
-		return 'not-implemented';
+	async findAll(
+		@Query('page') page = 1,
+		@Query('limit') limit = 10,
+	): Promise<User[]> {
+		return this.usersService.findAll(page, limit);
 	}
 
 	/**
-	 *
-	 * Authorize User and get their data from the authorization response
+	 * Get a user by ID
 	 */
+	@ApiOperation({ summary: 'Get a user by ID' })
+	@ApiOkResponse({ type: UserDto })
+	@Get(':id')
+	async getUserById(@Param('id') id: number): Promise<User> {
+		return this.usersService.findOne(id);
+	}
+
+	/**
+	 * Get the current user
+	 */
+	@ApiOperation({ summary: 'Get the current user' })
+	@ApiOkResponse({ type: UserDto })
 	@Get('me')
-	@ApiOkResponse({ type: User })
-	getMe(@Req() request: Request) {
-		return 'not-implemented';
+	async getMe(@Req() request: Request) {
+		//const userId = request.user.id; // assuming the user id is available in the request
+		// return this.usersService.findOne(userId);
 	}
 
 	/**
-	 * Authorize Kham/Sales/CSR or the user with same id
+	 * Update a user
 	 */
-	@Get(':uid')
-	@ApiOkResponse({ type: User })
-	findOne(@Param('uid') uid: string) {
-		return 'not-implemented';
-	}
-
-	/**
-	 * Authorize the user with same id
-	 * and edit their profile
-	 */
-	@Patch(':uid')
-	@ApiResponse({ type: User })
-	update(@Param('uid') uid: string, @Body() updateUserDto: UpdateUserDto) {
-		return 'not-implemented';
+	@ApiOperation({ summary: 'Update a user' })
+	@ApiResponse({ type: UserDto })
+	@Patch(':id')
+	async updateUser(@Param('id') id: number, @Body() userData: UpdateUserDto) {
+		return this.usersService.updateUser(id, userData);
 	}
 
 	/**
@@ -90,22 +105,37 @@ export class UsersController {
 	}
 
 	/**
-	 * add and FirebaseMessaging token to their profile
+	 * Update user's contact information
 	 */
-	@Patch(':uid/contact-info')
-	changeContactUserInfo(@Param('uid') uid: string) {
-		return 'not-implemented';
+	@ApiOperation({ summary: 'Update user contact information' })
+	@ApiBody({ type: CreateContactInfoDto })
+	@Patch(':id/contact-info')
+	async updateContactInfo(
+		@Param('id') id: number,
+		@Body() contactInfoDto: CreateContactInfoDto,
+	) {
+		return await this.usersService.addUserContactInfo(id, contactInfoDto);
 	}
-	//#region Notifications
 
 	/**
-	 * add and FirebaseMessaging token to their profile
+	 * Add a Firebase Messaging token to user's profile
 	 */
+	@ApiOperation({ summary: 'Add a Firebase Messaging token to user profile' })
 	@ApiBody({ type: AddFcmTokenDto })
-	@Post(':uid/fcm-token')
-	addFcmToken(@Param('uid') uid: string, @Body('token') token: string) {
-		return 'not-implemented';
+	@Post(':id/fcm-tokens')
+	async addFcmToken(
+		@Param('id') id: number,
+		@Body() fcmTokenData: AddFcmTokenDto,
+	) {
+		return this.usersService.addFcmToken(id, fcmTokenData);
 	}
 
-	//#endregion
+	/**
+	 * Deactivate a user
+	 */
+	@ApiOperation({ summary: 'Deactivate a user' })
+	@Delete(':id')
+	async deactivateUser(@Param('id') id: number) {
+		return this.usersService.deactivateUser(id);
+	}
 }

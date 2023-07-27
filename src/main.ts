@@ -24,7 +24,6 @@ async function bootstrap() {
 
 	const { httpAdapter } = app.get(HttpAdapterHost);
 	// if (process.env.NODE_ENV != 'production') openApi(app);
-
 	mvc(app);
 
 	await app.listen(3000, '0.0.0.0');

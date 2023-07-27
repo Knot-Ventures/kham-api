@@ -4,9 +4,13 @@ import { FirebaseAuthGuard } from '../guards/firebase-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 
 export function Auth(...roles: string[]) {
-	return applyDecorators(
-		SetMetadata('roles', roles),
-		ApiBearerAuth(),
-		UseGuards(FirebaseAuthGuard, RolesGuard),
-	);
+	const isProduction = process.env.NODE_ENV === 'production';
+
+	const decorators = [SetMetadata('roles', roles), ApiBearerAuth()];
+
+	if (isProduction) {
+		decorators.push(UseGuards(FirebaseAuthGuard, RolesGuard));
+	}
+
+	return applyDecorators(...decorators);
 }
