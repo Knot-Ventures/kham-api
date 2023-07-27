@@ -22,8 +22,7 @@ async function bootstrap() {
 		defaultVersion: VERSION_NEUTRAL,
 	});
 
-	const { httpAdapter } = app.get(HttpAdapterHost);
-	// if (process.env.NODE_ENV != 'production') openApi(app);
+	if (process.env.NODE_ENV != 'production') openApi(app);
 	mvc(app);
 
 	await app.listen(3000, '0.0.0.0');
@@ -75,7 +74,7 @@ function openApi(app: NestExpressApplication) {
 	}
 
 	const setupOptions: SwaggerCustomOptions = {
-		// explorer: true,
+		explorer: true,
 		customSiteTitle: 'Kham API',
 	};
 	SwaggerModule.setup('api/docs', app, document, setupOptions);
