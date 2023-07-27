@@ -10,6 +10,7 @@ import { DrizzleService } from '../../drizzle/drizzle.service';
 import adminAccess from '../../drizzle/schema/admin_access';
 import userContactInfo from '../../drizzle/schema/user_contact_info';
 import users from '../../drizzle/schema/users';
+import { CreateContactInfoDto } from './dto/create-contact-info.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
@@ -114,7 +115,7 @@ export class UsersService {
 		}
 	}
 
-	// Find a user by ID
+	// Find a user by ID (with his contact info and admin access)
 	async findOne(userId: number): Promise<any> {
 		try {
 			const user = await this.drizzleService.db.query.users.findFirst({
@@ -176,7 +177,6 @@ export class UsersService {
 
 			return updatedUser[0];
 		} catch (error) {
-			console.log(error);
 			throw new HttpException(
 				{
 					status:
@@ -184,6 +184,51 @@ export class UsersService {
 						HttpStatus.INTERNAL_SERVER_ERROR,
 					error:
 						error.response.error || 'Failed to update user data.',
+				},
+				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+	//check existing user
+	async userIdExists(id: number): Promise<User> {
+		const existingUser = await this.drizzleService.db
+			.select()
+			.from(users)
+			.limit(1)
+			.where(eq(users.id, id));
+
+		if (!existingUser[0]) {
+			throw new NotFoundException(`User with ID ${id} not found`);
+		}
+		return existingUser;
+	}
+
+	// Add contact information to user
+	async addUserContactInfo(id: number, contactInfoDto: CreateContactInfoDto) {
+		const existingUser = await this.userIdExists(id);
+		const contactInfoId = existingUser[0].contactInfoId;
+		try {
+			// Update contact info from userContactInfo table
+			const updatedUser = await this.drizzleService.db
+				.update(userContactInfo)
+				.set(contactInfoDto)
+				.where(eq(contactInfoId, userContactInfo.id))
+				.returning();
+
+			if (!updatedUser[0]) {
+				return 'Failed to update user contact info';
+			}
+
+			return updatedUser[0];
+		} catch (error) {
+			throw new HttpException(
+				{
+					status:
+						error.response.status ||
+						HttpStatus.INTERNAL_SERVER_ERROR,
+					error:
+						error.response.error ||
+						'Failed to update user contact info',
 				},
 				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
 			);

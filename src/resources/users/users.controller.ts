@@ -23,6 +23,7 @@ import { UsersService } from './users.service';
 
 import { Auth } from '../../auth/decorators/auth.decorator';
 import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
+import { CreateContactInfoDto } from './dto/create-contact-info.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
@@ -104,13 +105,17 @@ export class UsersController {
 	}
 
 	/**
-	 * add and FirebaseMessaging token to their profile
+	 * Update user's contact information
 	 */
-	@Patch(':uid/contact-info')
-	changeContactUserInfo(@Param('uid') uid: string) {
-		return 'not-implemented';
+	@ApiOperation({ summary: 'Update user contact information' })
+	@ApiBody({ type: CreateContactInfoDto })
+	@Patch(':id/contact-info')
+	async updateContactInfo(
+		@Param('id') id: number,
+		@Body() contactInfoDto: CreateContactInfoDto,
+	) {
+		return await this.usersService.addUserContactInfo(id, contactInfoDto);
 	}
-	//#region Notifications
 
 	/**
 	 * add and FirebaseMessaging token to their profile
