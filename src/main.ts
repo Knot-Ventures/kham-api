@@ -10,6 +10,9 @@ import {
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { AppModule } from './app.module';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env', override: false });
 
 const OPENAPI_SPEC_FILENAME = 'kham_open_api_spec.json';
 
@@ -47,7 +50,7 @@ function openApi(app: NestExpressApplication) {
 		.build();
 	const options: SwaggerDocumentOptions = {
 		operationIdFactory: (controllerKey: string, methodKey: string) =>
-			(process.env.dev ? controllerKey + '_' : '') + methodKey,
+			controllerKey + '_' + methodKey,
 	};
 	const document = SwaggerModule.createDocument(app, config, options);
 	const document2 = SwaggerModule.createDocument(app, config, {
@@ -55,23 +58,18 @@ function openApi(app: NestExpressApplication) {
 			controllerKey.replace('Controller', '') + '_' + methodKey,
 	});
 
-	if (process.env.dev) {
-		console.log(
-			'Swagger:: writing to file: ' +
-				join(process.cwd(), OPENAPI_SPEC_FILENAME),
-		);
-		writeFileSync(
+	console.log(
+		'Swagger:: writing to file: ' +
 			join(process.cwd(), OPENAPI_SPEC_FILENAME),
-			JSON.stringify(document, null, 4),
-		);
-		writeFileSync(
-			join(
-				process.cwd(),
-				OPENAPI_SPEC_FILENAME.replace('.json', '_2.json'),
-			),
-			JSON.stringify(document2, null, 4),
-		);
-	}
+	);
+	writeFileSync(
+		join(process.cwd(), OPENAPI_SPEC_FILENAME),
+		JSON.stringify(document, null, 4),
+	);
+	writeFileSync(
+		join(process.cwd(), OPENAPI_SPEC_FILENAME.replace('.json', '_2.json')),
+		JSON.stringify(document2, null, 4),
+	);
 
 	const setupOptions: SwaggerCustomOptions = {
 		explorer: true,

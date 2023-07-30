@@ -35,7 +35,7 @@ export class UserCatalogRequestsController {
 	 */
 	@Patch()
 	submit(@Body() submitCatalogRequestDto: SubmitCatalogRequestDto) {
-		return this.catalogRequestsService.create(submitCatalogRequestDto);
+		return this.catalogRequestsService.submit(submitCatalogRequestDto);
 	}
 
 	/**

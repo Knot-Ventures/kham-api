@@ -1,6 +1,9 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import * as postgres from 'postgres';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env', override: false });
 
 const {
 	PGHOST,
@@ -21,8 +24,10 @@ const sql = postgres({
 	port: parseInt(PGPORT),
 });
 const db = drizzle(sql);
+
 async function main() {
 	await migrate(db, { migrationsFolder: 'drizzle' });
 	return;
 }
+
 main();

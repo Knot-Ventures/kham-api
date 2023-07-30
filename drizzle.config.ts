@@ -1,4 +1,8 @@
 import type { Config } from 'drizzle-kit';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env', override: false });
+
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 
 const config: Config = {
@@ -10,7 +14,7 @@ const config: Config = {
 		user: PGUSER,
 		password: PGPASSWORD,
 		database: PGDATABASE,
-		ssl: true,
+		ssl: false,
 	},
 };
 export default config;

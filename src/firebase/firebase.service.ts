@@ -1,7 +1,6 @@
 import { Global, Injectable } from '@nestjs/common';
 import * as firebase from 'firebase-admin';
 import { Messaging } from 'firebase-admin/messaging';
-import { EmailIdentifier } from 'firebase-admin/auth';
 import axios from 'axios';
 import * as process from 'process';
 
@@ -20,7 +19,7 @@ export class FirebaseService {
 	async signin({ email, password }) {
 		return axios.post(
 			`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(
-				'AIzaSyAZU85TAVKEkws-vJr_vCZ_UKc02ZcyTvU',
+				process.env.FIREBASE_WEB_API_KEY,
 			)}`,
 			{
 				email,
