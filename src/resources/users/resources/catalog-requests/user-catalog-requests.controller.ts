@@ -1,17 +1,17 @@
 import {
-	Controller,
-	Get,
-	Post,
 	Body,
-	Patch,
-	Param,
+	Controller,
 	Delete,
+	Get,
+	Param,
+	Patch,
+	Post,
 } from '@nestjs/common';
-import { UserCatalogRequestsService } from './user-catalog-requests.service';
+import { ApiTags } from '@nestjs/swagger';
+import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
-import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { UserCatalogRequestsService } from './user-catalog-requests.service';
 
 @ApiTags('users-catalog-requests')
 @Controller(':uid/catalog-requests')
@@ -21,7 +21,6 @@ export class UserCatalogRequestsController {
 	) {}
 
 	/**
-	 * Authorize User
 	 * Create A catalog request ({status: 'parked'}) to allow the user to add items
 	 */
 	@Post()
@@ -53,8 +52,8 @@ export class UserCatalogRequestsController {
 	 * Authorize User
 	 * get the latest request that has not been pushed (ie; current cart)
 	 */
-	@Get('current')
-	findCurrent() {}
+	// @Get('current')
+	// findCurrent() {}
 
 	/**
 	 * Authorize User

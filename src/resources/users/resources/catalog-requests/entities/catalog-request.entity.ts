@@ -38,9 +38,6 @@ export class CatalogRequestEntity
 	@ApiProperty()
 	requestContactInfoId: string;
 
-	@OptionalApiProperty({ type: () => CatalogRequestContactInfoEntity })
-	requestContactInfo: CatalogRequestContactInfoEntity;
-
 	@ApiProperty()
 	itemCount: number;
 
@@ -61,4 +58,7 @@ export class CatalogRequestEntity
 
 	@ApiProperty()
 	otherItems: any;
+
+	@OptionalApiProperty({ type: () => CatalogRequestContactInfoEntity })
+	requestContactInfo: CatalogRequestContactInfoEntity;
 }

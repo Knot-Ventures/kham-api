@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 
 import { OptionalApiProperty } from '../../../../../openapi/decorators';
 import { GeoLocation } from '../entities/contact-info.entity';
@@ -30,9 +30,4 @@ export class CreateContactInfoDto {
 		example: { latitude: '123', longitude: '456' },
 	})
 	location?: GeoLocation;
-
-	@IsBoolean()
-	@IsOptional()
-	@ApiProperty()
-	default?: boolean;
 }
