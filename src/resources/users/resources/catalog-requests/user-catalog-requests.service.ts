@@ -1,5 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DrizzleError } from 'drizzle-orm';
+import {
+	HttpException,
+	HttpStatus,
+	Injectable,
+	InternalServerErrorException,
+} from '@nestjs/common';
+import { DrizzleError, eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '../../../../drizzle/drizzle.service';
 import catalogRequestContactInfo from '../../../../drizzle/schema/catalog_request_contact_info';
 import catalogRequests from '../../../../drizzle/schema/catalog_requests';
@@ -59,7 +64,6 @@ export class UserCatalogRequestsService {
 			console.log(createdCatalogRequest);
 			return createdCatalogRequest[0];
 		} catch (error) {
-			console.log(error);
 			if (error instanceof DrizzleError) {
 				console.error(error.message);
 			} else {
@@ -72,8 +76,51 @@ export class UserCatalogRequestsService {
 		}
 	} //return 201 status code
 
-	submit(submitCatalogRequestDto: SubmitCatalogRequestDto) {
-		return 'This action adds a new catalogRequest';
+	async submit(
+		submitCatalogRequestData: SubmitCatalogRequestDto,
+	): Promise<any> {
+		const { id, status, notes } = submitCatalogRequestData;
+
+		try {
+			// Fetch the catalog request to be submitted
+			const catalogRequest = (
+				await this.drizzleService.db
+					.select({
+						count: sql<number>`count(${catalogRequests.id})`,
+					})
+					.from(catalogRequests)
+					.limit(1)
+					.where(eq(catalogRequests.id, id))
+			)?.[0]?.count;
+			if (!catalogRequest) {
+				throw new HttpException(
+					{
+						status: HttpStatus.NOT_FOUND,
+						error: 'Catalog request not found.',
+					},
+					HttpStatus.NOT_FOUND,
+				);
+			}
+
+			// Update the catalog request with the submitted data
+			const updatedCatalogRequest = await this.drizzleService.db
+				.update(catalogRequests)
+				.set({ status, notes, respondedAt: new Date() })
+				.where(eq(catalogRequests.id, id))
+				.returning();
+
+			return updatedCatalogRequest[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to create catalog request',
+				);
+			}
+		}
 	}
 
 	findAll() {

@@ -12,6 +12,10 @@ import { CatalogRequestStatusType } from '../entities/catalog-request.entity';
 export class SubmitCatalogRequestDto {
 	@IsString()
 	@IsNotEmpty()
+	id: string;
+
+	@IsString()
+	@IsNotEmpty()
 	@ApiProperty()
 	userId: string;
 

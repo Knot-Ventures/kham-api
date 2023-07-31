@@ -29,7 +29,6 @@ export class UserCatalogRequestsController {
 	}
 
 	/**
-	 * Authorize User
 	 * Submit a catalog request for the user and notify Kham Sales Team
 	 */
 	@Patch()

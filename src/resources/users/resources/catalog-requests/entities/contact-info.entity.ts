@@ -1,7 +1,7 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { InferModel } from 'drizzle-orm';
-import { OptionalApiProperty } from 'src/openapi/decorators';
 import catalogRequestContactInfo from '../../../../../drizzle/schema/catalog_request_contact_info';
+import { OptionalApiProperty } from '../../../../../openapi/decorators';
 
 export class GeoLocation {
 	@ApiProperty()
