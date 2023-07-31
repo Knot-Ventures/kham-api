@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { InferModel } from 'drizzle-orm';
 import users from '../../../drizzle/schema/users';
 import { EnumTypeFromMap } from '../../../helpers/EnumTypeFromMap';
-import { UserContactInfoEntity } from './contact-info.entity';
 import { OptionalApiProperty } from '../../../openapi/decorators';
 import { AdminAccessEntity } from './admin-access.entity';
+import { UserContactInfoEntity } from './contact-info.entity';
 
 export const UserType = {
 	Individual: 'individual',
@@ -23,7 +23,13 @@ export type BusinessType = EnumTypeFromMap<typeof BusinessType>;
 export type UserModel = InferModel<typeof users>;
 
 export class UserEntity
-	implements Partial<UserModel & { userContactInfo: UserContactInfoEntity }>
+	implements
+		Partial<
+			UserModel & {
+				userContactInfo: UserContactInfoEntity;
+				adminAccess: AdminAccessEntity;
+			}
+		>
 {
 	@ApiProperty()
 	id: string;
