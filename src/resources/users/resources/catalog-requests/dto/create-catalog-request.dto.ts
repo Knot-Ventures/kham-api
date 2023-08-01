@@ -24,7 +24,7 @@ export class CreateCatalogRequestDto {
 
 	@IsInt()
 	@ApiProperty()
-	itemCount: number;
+	itemCount?: number;
 
 	@IsString()
 	@OptionalApiProperty()

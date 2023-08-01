@@ -20,6 +20,7 @@ import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { ItemsDto } from './dto/items.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
+import { UpdateItemCountDto } from './dto/update-item-count.dto';
 import {
 	CatalogRequestEntity,
 	CatalogRequestModel,
@@ -137,6 +138,16 @@ export class UserCatalogRequestsController {
 	// editItems(@Param('id') id: string) {
 	// 	return 'not-implemented';
 	// }
+	@Patch(':id/item-count')
+	async updateItemCount(
+		@Param('id') requestId: string,
+		@Body() updateItemCountDto: UpdateItemCountDto,
+	): Promise<CatalogRequestModel> {
+		return this.catalogRequestsService.updateItemCount(
+			requestId,
+			updateItemCountDto,
+		);
+	}
 
 	/**
 	 * Authorize User
