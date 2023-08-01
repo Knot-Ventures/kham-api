@@ -9,6 +9,7 @@ import { DrizzleError, eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '../../../../drizzle/drizzle.service';
 import catalogRequestContactInfo from '../../../../drizzle/schema/catalog_request_contact_info';
 import catalogRequests from '../../../../drizzle/schema/catalog_requests';
+import { AddItemsToRequestDto } from './dto/add-items.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
@@ -215,5 +216,34 @@ export class UserCatalogRequestsService {
 				);
 			}
 		}
+	}
+
+	async addItemsToRequest(
+		requestId: string,
+		addItemsDto: AddItemsToRequestDto,
+	): Promise<any> {
+		// Check if the request exists
+		const requestExists = (
+			await this.drizzleService.db
+				.select({
+					count: sql<number>`count(${catalogRequests.id})`,
+				})
+				.from(catalogRequests)
+				.limit(1)
+				.where(eq(catalogRequests.id, requestId))
+		)?.[0]?.count;
+		console.log(requestExists);
+		if (!requestExists) {
+			throw new NotFoundException('Catalog request not found.');
+		}
+
+		const updated = await this.drizzleService.db
+			.update(catalogRequests)
+			.set({
+				otherItems: sql`ARRAY_CAT(${catalogRequests.otherItems}, ${addItemsDto.items})`,
+			})
+			.where(eq(catalogRequests.id, requestId))
+			.returning();
+		return updated;
 	}
 }

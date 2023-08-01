@@ -1,7 +1,6 @@
 import {
 	Body,
 	Controller,
-	Delete,
 	Get,
 	Param,
 	Patch,
@@ -16,6 +15,7 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
+import { AddItemsToRequestDto } from './dto/add-items.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
@@ -70,16 +70,9 @@ export class UserCatalogRequestsController {
 	}
 
 	/**
-	 * Authorize User
 	 * get the latest request that has not been pushed (ie; current cart)
 	 */
-	// @Get('current')
-	// findCurrent() {}
 
-	/**
-	 * get a specific request
-	 * with Items and Contact Info
-	 */
 	/**
 	 * get a specific request
 	 * with Items and Contact Info
@@ -109,32 +102,35 @@ export class UserCatalogRequestsController {
 	}
 
 	/**
-	 * Authorize User
 	 * validate if there's an available request to add the items to (if not then create one)
 	 * Add Items to the Request
 	 */
 	@Post(':id/items')
-	addItems(@Param('id') id: string) {
-		return 'not-implemented';
+	addItems(
+		@Param('id') requestId: string,
+		@Body() addItemsDto: AddItemsToRequestDto,
+	) {
+		return this.catalogRequestsService.addItemsToRequest(
+			requestId,
+			addItemsDto,
+		);
 	}
 
 	/**
-	 * Authorize User
 	 * remove items from request
 	 */
-	@Delete(':id/items')
-	removeItems(@Param('id') id: string) {
-		return 'not-implemented';
-	}
+	// @Delete(':id/items')
+	// removeItems(@Param('id') id: string) {
+	// 	return 'not-implemented';
+	// }
 
 	/**
-	 * Authorize User
 	 * Edit Items Quantity
 	 */
-	@Patch(':id/items/:itemId')
-	editItems(@Param('id') id: string) {
-		return 'not-implemented';
-	}
+	// @Patch(':id/items/:itemId')
+	// editItems(@Param('id') id: string) {
+	// 	return 'not-implemented';
+	// }
 
 	/**
 	 * Authorize User
