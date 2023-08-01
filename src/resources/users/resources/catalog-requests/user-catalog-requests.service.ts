@@ -5,7 +5,7 @@ import {
 	InternalServerErrorException,
 	NotFoundException,
 } from '@nestjs/common';
-import { DrizzleError, eq, sql } from 'drizzle-orm';
+import { DrizzleError, and, eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '../../../../drizzle/drizzle.service';
 import catalogRequestContactInfo from '../../../../drizzle/schema/catalog_request_contact_info';
 import catalogRequestItems from '../../../../drizzle/schema/catalog_request_items';
@@ -463,6 +463,50 @@ export class UserCatalogRequestsService {
 					error?.message ||
 						error?.response?.message ||
 						'Failed to update item count for catalog request',
+				);
+			}
+		}
+	}
+
+	//delete
+	async cancelCatalogRequest(requestId: string) {
+		try {
+			// Check if the request exists and is pending
+			const catalogRequest = await this.drizzleService.db
+				.select()
+				.from(catalogRequests)
+				.limit(1)
+				.where(
+					and(
+						eq(catalogRequests.id, requestId),
+						eq(
+							catalogRequests.status,
+							CatalogRequestStatusType.Parked,
+						),
+					),
+				);
+
+			if (!catalogRequest[0]) {
+				throw new NotFoundException(
+					`Request with ID ${requestId} not found or not pending.`,
+				);
+			}
+
+			// Delete the catalog request
+			const deletedRequest = await this.drizzleService.db
+				.delete(catalogRequests)
+				.where(eq(catalogRequests.id, requestId))
+				.returning();
+
+			return deletedRequest[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to cancel and remove catalog request.',
 				);
 			}
 		}

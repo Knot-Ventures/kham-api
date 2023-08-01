@@ -213,13 +213,12 @@ export class UserCatalogRequestsController {
 	}
 
 	/**
-	 * Authorize User
 	 * cancel request
 	 * remove completely
 	 * only if request is pending
 	 */
-	// @Delete(':id')
-	// cancel(@Param('id') id: string) {
-	// 	return this.catalogRequestsService.remove(+id);
-	// }
+	@Delete(':id')
+	async cancelCatalogRequest(@Param('id') requestId: string) {
+		return this.catalogRequestsService.cancelCatalogRequest(requestId);
+	}
 }
