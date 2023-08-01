@@ -3,6 +3,7 @@ import {
 	HttpStatus,
 	Injectable,
 	InternalServerErrorException,
+	NotFoundException,
 } from '@nestjs/common';
 import { DrizzleError, eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '../../../../drizzle/drizzle.service';
@@ -10,7 +11,6 @@ import catalogRequestContactInfo from '../../../../drizzle/schema/catalog_reques
 import catalogRequests from '../../../../drizzle/schema/catalog_requests';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
-import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import {
 	CatalogRequestModel,
 	CatalogRequestStatusType,
@@ -140,15 +140,33 @@ export class UserCatalogRequestsService {
 		}
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} catalogRequest`;
-	}
+	async findOne(id: string): Promise<any> {
+		try {
+			const catalogRequest =
+				await this.drizzleService.db.query.catalogRequests.findFirst({
+					where: eq(catalogRequests.id, id),
+					with: {
+						requestContactInfo: true,
+					},
+				});
 
-	update(id: number, updateCatalogRequestDto: UpdateCatalogRequestDto) {
-		return `This action updates a #${id} catalogRequest`;
-	}
+			if (!catalogRequest) {
+				throw new NotFoundException(
+					`Catalog request with ID ${id} not found`,
+				);
+			}
 
-	remove(id: number) {
-		return `This action removes a #${id} catalogRequest`;
+			return catalogRequest;
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to create catalog request',
+				);
+			}
+		}
 	}
 }

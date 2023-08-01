@@ -11,12 +11,12 @@ import {
 import {
 	ApiOkResponse,
 	ApiOperation,
+	ApiParam,
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
-import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import {
 	CatalogRequestEntity,
 	CatalogRequestModel,
@@ -75,13 +75,19 @@ export class UserCatalogRequestsController {
 	// findCurrent() {}
 
 	/**
-	 * Authorize User
 	 * get a specific request
 	 * with Items and Contact Info
 	 */
+	/**
+	 * get a specific request
+	 * with Items and Contact Info
+	 */
+	@ApiOperation({ summary: 'Get a catalog request by ID' })
+	@ApiOkResponse({ type: CatalogRequestEntity })
+	@ApiParam({ name: 'id', type: String })
 	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.catalogRequestsService.findOne(+id);
+	async findOne(@Param('id') id: string): Promise<any> {
+		return this.catalogRequestsService.findOne(id);
 	}
 
 	/**
@@ -89,13 +95,13 @@ export class UserCatalogRequestsController {
 	 * update specific properties
 	 * Not all properties will be allowed to change TBD
 	 */
-	@Patch(':id')
-	update(
-		@Param('id') id: string,
-		@Body() updateCatalogRequestDto: UpdateCatalogRequestDto,
-	) {
-		return this.catalogRequestsService.update(+id, updateCatalogRequestDto);
-	}
+	// @Patch(':id')
+	// update(
+	// 	@Param('id') id: string,
+	// 	@Body() updateCatalogRequestDto: UpdateCatalogRequestDto,
+	// ) {
+	// 	return this.catalogRequestsService.update(+id, updateCatalogRequestDto);
+	// }
 
 	/**
 	 * Authorize User
@@ -131,8 +137,8 @@ export class UserCatalogRequestsController {
 	 * remove completely
 	 * only if request is pending
 	 */
-	@Delete(':id')
-	cancel(@Param('id') id: string) {
-		return this.catalogRequestsService.remove(+id);
-	}
+	// @Delete(':id')
+	// cancel(@Param('id') id: string) {
+	// 	return this.catalogRequestsService.remove(+id);
+	// }
 }
