@@ -300,8 +300,45 @@ export class UserCatalogRequestsService {
 			}
 		}
 	}
-	//remove item from otherItems in catalog request
+	//removeItemsFromRequest
 	async removeItemsFromRequest(
+		requestId: string,
+	): Promise<CatalogRequestItemsModel> {
+		try {
+			const catalogRequest = await this.drizzleService.db
+				.select()
+				.from(catalogRequests)
+				.where(eq(catalogRequests.id, requestId))
+				.limit(1);
+
+			if (!catalogRequest[0]) {
+				throw new NotFoundException(
+					`Catalog request with ID ${requestId} not found`,
+				);
+			}
+
+			// Remove items associated with the catalog request
+			const removedItems = await this.drizzleService.db
+				.delete(catalogRequestItems)
+				.where(eq(catalogRequestItems.catalog_request_id, requestId))
+				.returning();
+
+			return removedItems[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to remove items from catalog request',
+				);
+			}
+		}
+	}
+
+	//remove item from otherItems in catalog request
+	async removeItems(
 		requestId: string,
 		removeItemsDto: ItemsDto,
 	): Promise<CatalogRequestModel> {

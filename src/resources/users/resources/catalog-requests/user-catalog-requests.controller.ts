@@ -14,6 +14,7 @@ import {
 	ApiOperation,
 	ApiParam,
 	ApiQuery,
+	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
 import { CreateCatalogRequestItemDto } from './dto/create-catalog-request-item.dto';
@@ -22,7 +23,10 @@ import { ItemsDto } from './dto/items.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import { UpdateItemCountDto } from './dto/update-item-count.dto';
-import { CatalogRequestItemsModel } from './entities/catalog-request-item.entity';
+import {
+	CatalogRequestItemEntity,
+	CatalogRequestItemsModel,
+} from './entities/catalog-request-item.entity';
 import {
 	CatalogRequestEntity,
 	CatalogRequestModel,
@@ -135,12 +139,27 @@ export class UserCatalogRequestsController {
 	/**
 	 * remove items from request
 	 */
+	@ApiOperation({ summary: 'Remove items from a catalog request' })
+	@ApiParam({ name: 'id', description: 'Catalog request ID' })
+	@ApiResponse({
+		status: 200,
+		description: 'Items removed successfully',
+		type: CatalogRequestItemEntity,
+	})
+	@ApiResponse({ status: 404, description: 'Catalog request not found' })
+	@Delete(':id/items')
+	async removeItemsFromRequest(
+		@Param('id') requestId: string,
+	): Promise<CatalogRequestItemsModel> {
+		return this.catalogRequestsService.removeItemsFromRequest(requestId);
+	} //need to test it after create catalog entry
+
 	@Delete(':id/items')
 	async removeItems(
 		@Param('id') requestId: string,
 		@Body() removeItemsDto: ItemsDto,
 	): Promise<CatalogRequestModel> {
-		return this.catalogRequestsService.removeItemsFromRequest(
+		return this.catalogRequestsService.removeItems(
 			requestId,
 			removeItemsDto,
 		);
