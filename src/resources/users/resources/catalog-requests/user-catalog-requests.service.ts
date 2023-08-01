@@ -221,29 +221,39 @@ export class UserCatalogRequestsService {
 	async addItemsToRequest(
 		requestId: string,
 		addItemsDto: AddItemsToRequestDto,
-	): Promise<any> {
-		// Check if the request exists
-		const requestExists = (
-			await this.drizzleService.db
-				.select({
-					count: sql<number>`count(${catalogRequests.id})`,
-				})
+	): Promise<CatalogRequestModel> {
+		try {
+			// Check if the request exists
+			const catalogRequest = await this.drizzleService.db
+				.select()
 				.from(catalogRequests)
 				.limit(1)
-				.where(eq(catalogRequests.id, requestId))
-		)?.[0]?.count;
-		console.log(requestExists);
-		if (!requestExists) {
-			throw new NotFoundException('Catalog request not found.');
-		}
+				.where(eq(catalogRequests.id, requestId));
+			if (!catalogRequest[0]) {
+				throw new NotFoundException(
+					`request with ID ${requestId} not found`,
+				);
+			}
 
-		const updated = await this.drizzleService.db
-			.update(catalogRequests)
-			.set({
-				otherItems: sql`ARRAY_CAT(${catalogRequests.otherItems}, ${addItemsDto.items})`,
-			})
-			.where(eq(catalogRequests.id, requestId))
-			.returning();
-		return updated;
+			const otherItemsArray = catalogRequest[0].otherItems as any[];
+			otherItemsArray.push(...addItemsDto.items);
+
+			const updated = await this.drizzleService.db
+				.update(catalogRequests)
+				.set({ otherItems: otherItemsArray })
+				.where(eq(catalogRequests.id, requestId))
+				.returning();
+			return updated[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to create catalog request',
+				);
+			}
+		}
 	}
 }

@@ -109,7 +109,7 @@ export class UserCatalogRequestsController {
 	addItems(
 		@Param('id') requestId: string,
 		@Body() addItemsDto: AddItemsToRequestDto,
-	) {
+	): Promise<CatalogRequestModel> {
 		return this.catalogRequestsService.addItemsToRequest(
 			requestId,
 			addItemsDto,
