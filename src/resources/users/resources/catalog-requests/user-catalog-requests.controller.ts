@@ -6,11 +6,21 @@ import {
 	Param,
 	Patch,
 	Post,
+	Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+	ApiOkResponse,
+	ApiOperation,
+	ApiQuery,
+	ApiTags,
+} from '@nestjs/swagger';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
+import {
+	CatalogRequestEntity,
+	CatalogRequestModel,
+} from './entities/catalog-request.entity';
 import { UserCatalogRequestsService } from './user-catalog-requests.service';
 
 @ApiTags('users-catalog-requests')
@@ -24,7 +34,9 @@ export class UserCatalogRequestsController {
 	 * Create A catalog request ({status: 'parked'}) to allow the user to add items
 	 */
 	@Post()
-	create(@Body() createCatalogRequestDto: CreateCatalogRequestDto) {
+	create(
+		@Body() createCatalogRequestDto: CreateCatalogRequestDto,
+	): Promise<CatalogRequestModel> {
 		return this.catalogRequestsService.create(createCatalogRequestDto);
 	}
 
@@ -32,19 +44,27 @@ export class UserCatalogRequestsController {
 	 * Submit a catalog request for the user and notify Kham Sales Team
 	 */
 	@Patch()
-	submit(@Body() submitCatalogRequestDto: SubmitCatalogRequestDto) {
+	submit(
+		@Body() submitCatalogRequestDto: SubmitCatalogRequestDto,
+	): Promise<CatalogRequestModel> {
 		return this.catalogRequestsService.submit(submitCatalogRequestDto);
 	}
 
 	/**
-	 * Authorize User
 	 * get All the catalog requests for the current user
 	 * add select array to select columns from table
 	 * implement pagination
 	 */
+	@ApiOperation({ summary: 'Get all catalog requests' })
+	@ApiOkResponse({ type: CatalogRequestEntity, isArray: true })
+	@ApiQuery({ name: 'page', required: false, type: Number })
+	@ApiQuery({ name: 'limit', required: false, type: Number })
 	@Get()
-	findAll() {
-		return this.catalogRequestsService.findAll();
+	async findAll(
+		@Query('page') page = 1,
+		@Query('limit') limit = 10,
+	): Promise<CatalogRequestModel[]> {
+		return this.catalogRequestsService.findAll(page, limit);
 	}
 
 	/**

@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { InferModel } from 'drizzle-orm';
 import { EnumTypeFromMap } from '../../../../../helpers/EnumTypeFromMap';
 
-import { OptionalApiProperty } from 'src/openapi/decorators';
 import catalogRequests from '../../../../../drizzle/schema/catalog_requests';
 import { CatalogRequestContactInfoEntity } from './contact-info.entity';
 
@@ -59,6 +58,6 @@ export class CatalogRequestEntity
 	@ApiProperty()
 	otherItems: any;
 
-	@OptionalApiProperty({ type: () => CatalogRequestContactInfoEntity })
-	requestContactInfo: CatalogRequestContactInfoEntity;
+	// @OptionalApiProperty({ type: () => CatalogRequestContactInfoEntity })
+	// requestContactInfo: CatalogRequestContactInfoEntity;
 }

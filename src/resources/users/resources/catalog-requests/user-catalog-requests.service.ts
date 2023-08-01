@@ -12,7 +12,7 @@ import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import {
-	CatalogRequestEntity,
+	CatalogRequestModel,
 	CatalogRequestStatusType,
 } from './entities/catalog-request.entity';
 
@@ -22,7 +22,7 @@ export class UserCatalogRequestsService {
 
 	async create(
 		createCatalogRequestDto: CreateCatalogRequestDto,
-	): Promise<CatalogRequestEntity> {
+	): Promise<CatalogRequestModel> {
 		try {
 			const createdCatalogRequest =
 				await this.drizzleService.db.transaction(async (tx) => {
@@ -54,15 +54,10 @@ export class UserCatalogRequestsService {
 						);
 					}
 					// Combine contactInfo and catalogRequest into a single object
-					const result = {
-						...catalogRequest[0],
-						requestContactInfo: contactInfo[0],
-					};
 
-					return result;
+					return catalogRequest[0];
 				});
-			console.log(createdCatalogRequest);
-			return createdCatalogRequest[0];
+			return createdCatalogRequest;
 		} catch (error) {
 			if (error instanceof DrizzleError) {
 				console.error(error.message);
@@ -78,7 +73,7 @@ export class UserCatalogRequestsService {
 
 	async submit(
 		submitCatalogRequestData: SubmitCatalogRequestDto,
-	): Promise<any> {
+	): Promise<CatalogRequestModel> {
 		const { id, status, notes } = submitCatalogRequestData;
 
 		try {
@@ -123,8 +118,26 @@ export class UserCatalogRequestsService {
 		}
 	}
 
-	findAll() {
-		return `This action returns all catalogRequests`;
+	async findAll(page: number, limit: number): Promise<CatalogRequestModel[]> {
+		const offset = (page - 1) * limit;
+
+		try {
+			return this.drizzleService.db
+				.select()
+				.from(catalogRequests)
+				.limit(limit)
+				.offset(offset);
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to create catalog request',
+				);
+			}
+		}
 	}
 
 	findOne(id: number) {
