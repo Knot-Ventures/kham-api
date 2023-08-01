@@ -14,6 +14,7 @@ import { CreateCatalogRequestItemDto } from './dto/create-catalog-request-item.d
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { ItemsDto } from './dto/items.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
+import { UpdateCatalogRequestItemDto } from './dto/update-catalog-request-item.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import { UpdateItemCountDto } from './dto/update-item-count.dto';
 import { CatalogRequestItemsModel } from './entities/catalog-request-item.entity';
@@ -377,6 +378,52 @@ export class UserCatalogRequestsService {
 					error?.message ||
 						error?.response?.message ||
 						'Failed to remove items from catalog request',
+				);
+			}
+		}
+	}
+
+	//updateItemQuantity
+	async updateItemQuantity(
+		requestId: string,
+		itemId: string,
+		updateItemDto: UpdateCatalogRequestItemDto,
+	): Promise<CatalogRequestItemsModel> {
+		try {
+			const catalogRequest = await this.drizzleService.db
+				.select()
+				.from(catalogRequests)
+				.where(eq(catalogRequests.id, requestId))
+				.limit(1);
+
+			if (!catalogRequest[0]) {
+				throw new NotFoundException(
+					`Catalog request with ID ${requestId} not found`,
+				);
+			}
+
+			// Check if the catalog request item exists and update its quantity
+			const updatedItem = await this.drizzleService.db
+				.update(catalogRequestItems)
+				.set({ quantity: updateItemDto.quantity })
+				.where(eq(catalogRequestItems.catalog_request_id, requestId))
+				.returning();
+
+			if (!updatedItem[0]) {
+				throw new NotFoundException(
+					`Item with ID ${itemId} not found in the catalog request`,
+				);
+			}
+
+			return updatedItem[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to update item count for catalog request',
 				);
 			}
 		}

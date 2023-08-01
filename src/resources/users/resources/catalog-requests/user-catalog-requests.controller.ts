@@ -21,6 +21,7 @@ import { CreateCatalogRequestItemDto } from './dto/create-catalog-request-item.d
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { ItemsDto } from './dto/items.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
+import { UpdateCatalogRequestItemDto } from './dto/update-catalog-request-item.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import { UpdateItemCountDto } from './dto/update-item-count.dto';
 import {
@@ -171,6 +172,35 @@ export class UserCatalogRequestsController {
 	// editItems(@Param('id') id: string) {
 	// 	return 'not-implemented';
 	// }
+
+	@ApiOperation({
+		summary: 'Update quantity of a specific item in a catalog request',
+	})
+	@ApiParam({ name: 'id', description: 'Catalog request ID' })
+	@ApiParam({ name: 'itemId', description: 'ID of the item to update' })
+	@ApiResponse({
+		status: 200,
+		description: 'Item quantity updated successfully',
+		type: CatalogRequestItemEntity,
+	})
+	@ApiResponse({
+		status: 404,
+		description: 'Catalog request or item not found',
+	})
+	@Patch(':id/items/:itemId')
+	async updateItemQuantity(
+		@Param('id') requestId: string,
+		@Param('itemId') itemId: string,
+		@Body() updateItemDto: UpdateCatalogRequestItemDto,
+	): Promise<CatalogRequestItemsModel> {
+		return this.catalogRequestsService.updateItemQuantity(
+			requestId,
+			itemId,
+			updateItemDto,
+		);
+	} //need to test
+
+	//edit items cout in catalog request
 	@Patch(':id/item-count')
 	async updateItemCount(
 		@Param('id') requestId: string,
