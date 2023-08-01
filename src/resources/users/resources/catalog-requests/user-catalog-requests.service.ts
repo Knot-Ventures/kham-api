@@ -9,8 +9,8 @@ import { DrizzleError, eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '../../../../drizzle/drizzle.service';
 import catalogRequestContactInfo from '../../../../drizzle/schema/catalog_request_contact_info';
 import catalogRequests from '../../../../drizzle/schema/catalog_requests';
-import { AddItemsToRequestDto } from './dto/add-items.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
+import { ItemsDto } from './dto/items.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import {
@@ -220,7 +220,7 @@ export class UserCatalogRequestsService {
 
 	async addItemsToRequest(
 		requestId: string,
-		addItemsDto: AddItemsToRequestDto,
+		addItemsDto: ItemsDto,
 	): Promise<CatalogRequestModel> {
 		try {
 			// Check if the request exists
@@ -252,6 +252,50 @@ export class UserCatalogRequestsService {
 					error?.message ||
 						error?.response?.message ||
 						'Failed to create catalog request',
+				);
+			}
+		}
+	}
+
+	async removeItemsFromRequest(
+		requestId: string,
+		removeItemsDto: ItemsDto,
+	): Promise<CatalogRequestModel> {
+		try {
+			// Check if the request exists
+			const catalogRequest = await this.drizzleService.db
+				.select()
+				.from(catalogRequests)
+				.limit(1)
+				.where(eq(catalogRequests.id, requestId));
+
+			if (!catalogRequest[0]) {
+				throw new NotFoundException(
+					`Request with ID ${requestId} not found.`,
+				);
+			}
+
+			// Filter out the items to remove
+			const otherItemsArray = (
+				catalogRequest[0].otherItems as string[]
+			).filter((item) => !removeItemsDto.items.includes(item));
+
+			// Update the catalog request in the database
+			const updated = await this.drizzleService.db
+				.update(catalogRequests)
+				.set({ otherItems: otherItemsArray })
+				.where(eq(catalogRequests.id, requestId))
+				.returning();
+
+			return updated[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to remove items from catalog request',
 				);
 			}
 		}

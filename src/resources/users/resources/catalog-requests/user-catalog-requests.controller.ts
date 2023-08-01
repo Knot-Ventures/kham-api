@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	Param,
 	Patch,
@@ -15,8 +16,8 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
-import { AddItemsToRequestDto } from './dto/add-items.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
+import { ItemsDto } from './dto/items.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import {
@@ -108,7 +109,7 @@ export class UserCatalogRequestsController {
 	@Post(':id/items')
 	addItems(
 		@Param('id') requestId: string,
-		@Body() addItemsDto: AddItemsToRequestDto,
+		@Body() addItemsDto: ItemsDto,
 	): Promise<CatalogRequestModel> {
 		return this.catalogRequestsService.addItemsToRequest(
 			requestId,
@@ -119,11 +120,16 @@ export class UserCatalogRequestsController {
 	/**
 	 * remove items from request
 	 */
-	// @Delete(':id/items')
-	// removeItems(@Param('id') id: string) {
-	// 	return 'not-implemented';
-	// }
-
+	@Delete(':id/items')
+	async removeItems(
+		@Param('id') requestId: string,
+		@Body() removeItemsDto: ItemsDto,
+	): Promise<CatalogRequestModel> {
+		return this.catalogRequestsService.removeItemsFromRequest(
+			requestId,
+			removeItemsDto,
+		);
+	}
 	/**
 	 * Edit Items Quantity
 	 */
