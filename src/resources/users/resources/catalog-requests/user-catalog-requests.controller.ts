@@ -16,11 +16,13 @@ import {
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
+import { CreateCatalogRequestItemDto } from './dto/create-catalog-request-item.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { ItemsDto } from './dto/items.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import { UpdateItemCountDto } from './dto/update-item-count.dto';
+import { CatalogRequestItemsModel } from './entities/catalog-request-item.entity';
 import {
 	CatalogRequestEntity,
 	CatalogRequestModel,
@@ -107,15 +109,27 @@ export class UserCatalogRequestsController {
 	 * validate if there's an available request to add the items to (if not then create one)
 	 * Add Items to the Request
 	 */
+	//Add Items to the Request
+	@ApiOperation({ summary: 'Add items to a catalog request' })
+	@ApiParam({ name: 'id', description: 'Catalog request ID' })
 	@Post(':id/items')
+	async addItemsToRequest(
+		@Param('id') requestId: string,
+		@Body() createCatalogRequestItemDto: CreateCatalogRequestItemDto,
+	): Promise<CatalogRequestItemsModel> {
+		return this.catalogRequestsService.addItemsToRequest(
+			requestId,
+			createCatalogRequestItemDto,
+		);
+	} //need to test it after create catalog entry
+
+	//add items to otherItems in catalogRequestTable
+	@Post(':id/otherItems')
 	addItems(
 		@Param('id') requestId: string,
 		@Body() addItemsDto: ItemsDto,
 	): Promise<CatalogRequestModel> {
-		return this.catalogRequestsService.addItemsToRequest(
-			requestId,
-			addItemsDto,
-		);
+		return this.catalogRequestsService.addItems(requestId, addItemsDto);
 	}
 
 	/**

@@ -8,12 +8,15 @@ import {
 import { DrizzleError, eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '../../../../drizzle/drizzle.service';
 import catalogRequestContactInfo from '../../../../drizzle/schema/catalog_request_contact_info';
+import catalogRequestItems from '../../../../drizzle/schema/catalog_request_items';
 import catalogRequests from '../../../../drizzle/schema/catalog_requests';
+import { CreateCatalogRequestItemDto } from './dto/create-catalog-request-item.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { ItemsDto } from './dto/items.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import { UpdateItemCountDto } from './dto/update-item-count.dto';
+import { CatalogRequestItemsModel } from './entities/catalog-request-item.entity';
 import {
 	CatalogRequestEntity,
 	CatalogRequestModel,
@@ -23,7 +26,7 @@ import {
 @Injectable()
 export class UserCatalogRequestsService {
 	constructor(private readonly drizzleService: DrizzleService) {}
-
+	//create
 	async create(
 		createCatalogRequestDto: CreateCatalogRequestDto,
 	): Promise<CatalogRequestModel> {
@@ -73,8 +76,8 @@ export class UserCatalogRequestsService {
 				);
 			}
 		}
-	} //return 201 status code
-
+	}
+	//submit
 	async submit(
 		submitCatalogRequestData: SubmitCatalogRequestDto,
 	): Promise<CatalogRequestModel> {
@@ -121,7 +124,7 @@ export class UserCatalogRequestsService {
 			}
 		}
 	}
-
+	//get All
 	async findAll(page: number, limit: number): Promise<CatalogRequestModel[]> {
 		const offset = (page - 1) * limit;
 
@@ -143,7 +146,7 @@ export class UserCatalogRequestsService {
 			}
 		}
 	}
-
+	//get by Id
 	async findOne(id: string): Promise<CatalogRequestEntity> {
 		try {
 			const catalogRequest =
@@ -173,7 +176,7 @@ export class UserCatalogRequestsService {
 			}
 		}
 	}
-
+	//update
 	async update(
 		id: string,
 		updateCatalogRequestDto: UpdateCatalogRequestDto,
@@ -218,8 +221,48 @@ export class UserCatalogRequestsService {
 			}
 		}
 	}
-
+	//add item to catalogRequestItem
 	async addItemsToRequest(
+		requestId: string,
+		createCatalogRequestItemDto: CreateCatalogRequestItemDto,
+	): Promise<CatalogRequestItemsModel> {
+		try {
+			const catalogRequest = await this.drizzleService.db
+				.select()
+				.from(catalogRequests)
+				.where(eq(catalogRequests.id, requestId))
+				.limit(1);
+
+			if (!catalogRequest[0]) {
+				throw new NotFoundException(
+					`Catalog request with ID ${requestId} not found`,
+				);
+			}
+
+			// Create a new catalog request item
+			const newItem = await this.drizzleService.db
+				.insert(catalogRequestItems)
+				.values({
+					...createCatalogRequestItemDto,
+					catalog_request_id: requestId,
+				})
+				.returning();
+
+			return newItem[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to add item to catalogRequestItem',
+				);
+			}
+		}
+	}
+	//add item to otherItems in catalog request
+	async addItems(
 		requestId: string,
 		addItemsDto: ItemsDto,
 	): Promise<CatalogRequestModel> {
@@ -252,12 +295,12 @@ export class UserCatalogRequestsService {
 				throw new InternalServerErrorException(
 					error?.message ||
 						error?.response?.message ||
-						'Failed to create catalog request',
+						'Failed to add item',
 				);
 			}
 		}
 	}
-
+	//remove item from otherItems in catalog request
 	async removeItemsFromRequest(
 		requestId: string,
 		removeItemsDto: ItemsDto,
