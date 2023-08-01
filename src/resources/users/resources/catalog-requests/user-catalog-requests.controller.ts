@@ -9,6 +9,7 @@ import {
 	Query,
 } from '@nestjs/common';
 import {
+	ApiBody,
 	ApiOkResponse,
 	ApiOperation,
 	ApiParam,
@@ -17,6 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
+import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import {
 	CatalogRequestEntity,
 	CatalogRequestModel,
@@ -86,22 +88,25 @@ export class UserCatalogRequestsController {
 	@ApiOkResponse({ type: CatalogRequestEntity })
 	@ApiParam({ name: 'id', type: String })
 	@Get(':id')
-	async findOne(@Param('id') id: string): Promise<any> {
+	async findOne(@Param('id') id: string): Promise<CatalogRequestEntity> {
 		return this.catalogRequestsService.findOne(id);
 	}
 
 	/**
-	 * Authorize User
 	 * update specific properties
 	 * Not all properties will be allowed to change TBD
 	 */
-	// @Patch(':id')
-	// update(
-	// 	@Param('id') id: string,
-	// 	@Body() updateCatalogRequestDto: UpdateCatalogRequestDto,
-	// ) {
-	// 	return this.catalogRequestsService.update(+id, updateCatalogRequestDto);
-	// }
+	@ApiOperation({ summary: 'Update a catalog request by ID' })
+	@ApiBody({ type: UpdateCatalogRequestDto })
+	@ApiOkResponse({ type: CatalogRequestEntity })
+	@ApiParam({ name: 'id', type: String })
+	@Patch(':id')
+	async update(
+		@Param('id') id: string,
+		@Body() updateCatalogRequestDto: UpdateCatalogRequestDto,
+	): Promise<CatalogRequestModel> {
+		return this.catalogRequestsService.update(id, updateCatalogRequestDto);
+	}
 
 	/**
 	 * Authorize User
