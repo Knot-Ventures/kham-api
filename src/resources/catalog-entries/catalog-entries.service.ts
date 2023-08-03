@@ -58,7 +58,7 @@ export class CatalogEntriesService {
 				throw new InternalServerErrorException(
 					error?.message ||
 						error?.response?.message ||
-						'Failed to create catalog request',
+						'Failed to create catalog entry',
 				);
 			}
 		}
@@ -162,7 +162,36 @@ export class CatalogEntriesService {
 		}
 	}
 
-	remove(id: number) {
-		return `This action removes a #${id} catalogEntry`;
+	async remove(id: string): Promise<CatalogEntryEntity> {
+		const catalogEntryExists = await this.drizzleService.db
+			.select()
+			.from(catalogEntries)
+			.limit(1)
+			.where(eq(catalogEntries.id, id));
+
+		if (!catalogEntryExists[0]) {
+			throw new NotFoundException(
+				`Catalog Entry with ID ${id} not found`,
+			);
+		}
+
+		try {
+			const removedCatalog = await this.drizzleService.db
+				.update(catalogEntries)
+				.set({ isRemoved: true })
+				.where(eq(catalogEntries.id, id))
+				.returning();
+			return removedCatalog[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to remove catalog entry from rotation',
+				);
+			}
+		}
 	}
 }

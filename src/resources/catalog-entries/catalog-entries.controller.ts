@@ -93,8 +93,10 @@ export class CatalogEntriesController {
 	/**
 	 * Remove from rotation without delete
 	 */
+	@ApiOperation({ summary: 'Remove a catalog entry from rotation by ID' })
+	// @ApiParam({ name: 'id', type:  })
 	@Delete(':id')
-	remove(@Param('id') id: string) {
-		return this.catalogEntriesService.remove(+id);
+	remove(@Param('id') id: string): Promise<CatalogEntryEntity> {
+		return this.catalogEntriesService.remove(id);
 	}
 }
