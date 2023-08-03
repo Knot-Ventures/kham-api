@@ -1,16 +1,17 @@
 import {
-	Controller,
-	Get,
-	Post,
 	Body,
-	Patch,
-	Param,
+	Controller,
 	Delete,
+	Get,
+	Param,
+	Patch,
+	Post,
 } from '@nestjs/common';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CatalogEntriesService } from './catalog-entries.service';
 import { CreateCatalogEntryDto } from './dto/create-catalog-entry.dto';
 import { UpdateCatalogEntryDto } from './dto/update-catalog-entry.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { CatalogEntryEntity } from './entities/catalog-entry.entity';
 
 @ApiTags('catalog-entries')
 @Controller('catalog-entries')
@@ -20,12 +21,18 @@ export class CatalogEntriesController {
 	) {}
 
 	/**
-	 * Authorize Knot Sales/Admin
 	 * Validate Product Id, Vendor
 	 * Add a new Catalog Entry
 	 */
+	@ApiBody({ type: CreateCatalogEntryDto })
+	@ApiResponse({
+		description: 'The catalog entry has been successfully created.',
+		type: CatalogEntryEntity,
+	})
 	@Post()
-	create(@Body() createCatalogEntryDto: CreateCatalogEntryDto) {
+	create(
+		@Body() createCatalogEntryDto: CreateCatalogEntryDto,
+	): Promise<CatalogEntryEntity> {
 		return this.catalogEntriesService.create(createCatalogEntryDto);
 	}
 
