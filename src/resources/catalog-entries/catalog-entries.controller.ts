@@ -12,6 +12,7 @@ import {
 	ApiBody,
 	ApiOkResponse,
 	ApiOperation,
+	ApiParam,
 	ApiQuery,
 	ApiResponse,
 	ApiTags,
@@ -65,9 +66,12 @@ export class CatalogEntriesController {
 	 * Public
 	 * fetch with categories and similar products ( if there are entries with same product or entries in the same category)
 	 */
+	@ApiOperation({ summary: 'Get a catalog entry by ID' })
+	@ApiOkResponse({ type: CatalogEntryEntity })
+	@ApiParam({ name: 'id', type: String })
 	@Get(':id')
 	findOne(@Param('id') id: string) {
-		return this.catalogEntriesService.findOne(+id);
+		return this.catalogEntriesService.findOne(id);
 	}
 
 	/**

@@ -1,5 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DrizzleError } from 'drizzle-orm';
+import {
+	Injectable,
+	InternalServerErrorException,
+	NotFoundException,
+} from '@nestjs/common';
+import { DrizzleError, eq } from 'drizzle-orm';
 import { DrizzleService } from '../../drizzle/drizzle.service';
 import catalogEntries from '../../drizzle/schema/catalog_entries';
 import products from '../../drizzle/schema/products';
@@ -83,8 +87,36 @@ export class CatalogEntriesService {
 		}
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} catalogEntry`;
+	//findById
+	async findOne(id: string): Promise<CatalogEntryEntity> {
+		try {
+			const catalogEntry =
+				await this.drizzleService.db.query.catalogEntries.findFirst({
+					where: eq(catalogEntries.id, id),
+					with: {
+						product: true,
+						vendor: true,
+					},
+				});
+
+			if (!catalogEntry) {
+				throw new NotFoundException(
+					`Catalog Entry with ID ${id} not found`,
+				);
+			}
+
+			return catalogEntry;
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to find catalog entry',
+				);
+			}
+		}
 	}
 
 	update(id: number, updateCatalogEntryDto: UpdateCatalogEntryDto) {
