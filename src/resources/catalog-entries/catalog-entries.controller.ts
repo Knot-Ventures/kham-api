@@ -6,8 +6,16 @@ import {
 	Param,
 	Patch,
 	Post,
+	Query,
 } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+	ApiBody,
+	ApiOkResponse,
+	ApiOperation,
+	ApiQuery,
+	ApiResponse,
+	ApiTags,
+} from '@nestjs/swagger';
 import { CatalogEntriesService } from './catalog-entries.service';
 import { CreateCatalogEntryDto } from './dto/create-catalog-entry.dto';
 import { UpdateCatalogEntryDto } from './dto/update-catalog-entry.dto';
@@ -41,9 +49,16 @@ export class CatalogEntriesController {
 	 * fetch with categories
 	 * paginate
 	 */
+	@ApiOperation({ summary: 'Get all catalog entries' })
+	@ApiOkResponse({ type: CatalogEntryEntity, isArray: true })
+	@ApiQuery({ name: 'page', required: false, type: Number })
+	@ApiQuery({ name: 'limit', required: false, type: Number })
 	@Get()
-	findAll() {
-		return this.catalogEntriesService.findAll();
+	findAll(
+		@Query('page') page = 1,
+		@Query('limit') limit = 10,
+	): Promise<CatalogEntryEntity[]> {
+		return this.catalogEntriesService.findAll(page, limit);
 	}
 
 	/**

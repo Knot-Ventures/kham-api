@@ -6,7 +6,10 @@ import products from '../../drizzle/schema/products';
 import vendors from '../../drizzle/schema/vendors';
 import { CreateCatalogEntryDto } from './dto/create-catalog-entry.dto';
 import { UpdateCatalogEntryDto } from './dto/update-catalog-entry.dto';
-import { CatalogEntryModel } from './entities/catalog-entry.entity';
+import {
+	CatalogEntryEntity,
+	CatalogEntryModel,
+} from './entities/catalog-entry.entity';
 
 @Injectable()
 export class CatalogEntriesService {
@@ -57,8 +60,27 @@ export class CatalogEntriesService {
 		}
 	}
 
-	findAll() {
-		return `This action returns all catalogEntries`;
+	//get All
+	async findAll(page: number, limit: number): Promise<CatalogEntryEntity[]> {
+		const offset = (page - 1) * limit;
+
+		try {
+			return this.drizzleService.db
+				.select()
+				.from(catalogEntries)
+				.limit(limit)
+				.offset(offset);
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to get All catalog entry',
+				);
+			}
+		}
 	}
 
 	findOne(id: number) {
