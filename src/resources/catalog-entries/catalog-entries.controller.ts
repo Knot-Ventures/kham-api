@@ -70,21 +70,24 @@ export class CatalogEntriesController {
 	@ApiOkResponse({ type: CatalogEntryEntity })
 	@ApiParam({ name: 'id', type: String })
 	@Get(':id')
-	findOne(@Param('id') id: string) {
+	findOne(@Param('id') id: string): Promise<CatalogEntryEntity> {
 		return this.catalogEntriesService.findOne(id);
 	}
 
 	/**
-	 * Authorize Knot Sales/Admin
 	 * Validate Product Id, Vendor
 	 * Edit the Catalog Entry
 	 */
+	@ApiOperation({ summary: 'Update a catalog Entry by ID' })
+	@ApiBody({ type: UpdateCatalogEntryDto })
+	@ApiOkResponse({ type: CatalogEntryEntity })
+	@ApiParam({ name: 'id', type: String })
 	@Patch(':id')
 	update(
 		@Param('id') id: string,
 		@Body() updateCatalogEntryDto: UpdateCatalogEntryDto,
-	) {
-		return this.catalogEntriesService.update(+id, updateCatalogEntryDto);
+	): Promise<CatalogEntryEntity> {
+		return this.catalogEntriesService.update(id, updateCatalogEntryDto);
 	}
 
 	/**

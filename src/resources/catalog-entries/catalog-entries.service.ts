@@ -119,8 +119,47 @@ export class CatalogEntriesService {
 		}
 	}
 
-	update(id: number, updateCatalogEntryDto: UpdateCatalogEntryDto) {
-		return `This action updates a #${id} catalogEntry`;
+	//update
+	async update(
+		id: string,
+		updateCatalogEntryDto: UpdateCatalogEntryDto,
+	): Promise<CatalogEntryEntity> {
+		const catalogEntryExists = (
+			await this.drizzleService.db
+				.select({ count: eq(catalogEntries.id, id) })
+				.from(catalogEntries)
+		)?.[0]?.count;
+
+		if (typeof catalogEntryExists === 'number' && catalogEntryExists <= 0) {
+			throw new NotFoundException(
+				`Catalog entry with ID ${id} not found`,
+			);
+		}
+
+		try {
+			// Update the catalog entry data
+			const updatedCatalogEntry = await this.drizzleService.db
+				.update(catalogEntries)
+				.set(updateCatalogEntryDto)
+				.where(eq(catalogEntries.id, id))
+				.returning();
+
+			if (!updatedCatalogEntry[0]) {
+				throw new Error('Failed to update catalog Entry');
+			}
+
+			return updatedCatalogEntry[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to update catalog entry',
+				);
+			}
+		}
 	}
 
 	remove(id: number) {
