@@ -2,8 +2,9 @@ import {
 	Inject,
 	Injectable,
 	InternalServerErrorException,
+	NotFoundException,
 } from '@nestjs/common';
-import { DrizzleError } from 'drizzle-orm';
+import { DrizzleError, eq } from 'drizzle-orm';
 import { DrizzleService } from '../../drizzle/drizzle.service';
 import catalogRequestContactInfo from '../../drizzle/schema/catalog_request_contact_info';
 import catalogRequests from '../../drizzle/schema/catalog_requests';
@@ -99,8 +100,31 @@ export class CatalogRequestsService {
 		}
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} catalogRequest`;
+	async findOne(id: string): Promise<CatalogRequestEntity> {
+		try {
+			const catalogRequest =
+				await this.drizzleService.db.query.catalogRequests.findFirst({
+					where: eq(catalogRequests.id, id),
+				});
+
+			if (!catalogRequest) {
+				throw new NotFoundException(
+					`Catalog request with ID ${id} not found`,
+				);
+			}
+
+			return catalogRequest;
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to create catalog request',
+				);
+			}
+		}
 	}
 
 	update(id: number, updateCatalogRequestDto: UpdateCatalogRequestDto) {

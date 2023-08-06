@@ -11,6 +11,7 @@ import {
 import {
 	ApiOkResponse,
 	ApiOperation,
+	ApiParam,
 	ApiQuery,
 	ApiTags,
 } from '@nestjs/swagger';
@@ -57,9 +58,12 @@ export class CatalogRequestsController {
 	 * Authorize Kham Sales Team
 	 * get a specific request
 	 */
+	@ApiOperation({ summary: 'Get a catalog request by ID' })
+	@ApiOkResponse({ type: CatalogRequestEntity })
+	@ApiParam({ name: 'id', type: Number })
 	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.catalogRequestsService.findOne(+id);
+	async findOne(@Param('id') id: string): Promise<CatalogRequestEntity> {
+		return this.catalogRequestsService.findOne(id);
 	}
 
 	/**
