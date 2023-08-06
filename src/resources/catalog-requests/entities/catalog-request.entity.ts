@@ -64,5 +64,5 @@ export class CatalogRequestEntity implements CatalogRequestModel {
 		type: () => CatalogRequestItemEntity,
 		isArray: true,
 	})
-	catalogRequestItems: CatalogRequestItemEntity[];
+	catalogRequestItems?: CatalogRequestItemEntity[];
 }

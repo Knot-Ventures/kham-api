@@ -1,4 +1,50 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateCatalogRequestDto } from './create-catalog-request.dto';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import {
+	IsArray,
+	IsDate,
+	IsEnum,
+	IsInt,
+	IsOptional,
+	IsString,
+} from 'class-validator';
 
-export class UpdateCatalogRequestDto extends PartialType(CreateCatalogRequestDto) {}
+import { CatalogRequestStatusType } from '../entities/catalog-request.entity';
+export class UpdateCatalogRequestDto {
+	@IsString()
+	@ApiPropertyOptional()
+	userId?: string;
+
+	@IsString()
+	@ApiPropertyOptional()
+	requestContactInfoId?: string;
+
+	@IsInt()
+	@ApiPropertyOptional()
+	itemCount?: number;
+
+	@IsDate()
+	@ApiPropertyOptional()
+	createdAt?: Date;
+
+	@IsDate()
+	@ApiPropertyOptional()
+	submittedAt?: Date;
+
+	@IsDate()
+	@ApiPropertyOptional()
+	respondedAt?: Date;
+
+	@IsEnum(CatalogRequestStatusType)
+	@ApiPropertyOptional({ enum: CatalogRequestStatusType })
+	status?: CatalogRequestStatusType;
+
+	@IsString()
+	@IsOptional()
+	@ApiPropertyOptional()
+	notes?: string;
+
+	@IsArray()
+	@IsOptional()
+	@ApiPropertyOptional({ type: [Object] })
+	otherItems?: any[];
+}
