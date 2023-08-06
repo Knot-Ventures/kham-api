@@ -127,8 +127,49 @@ export class CatalogRequestsService {
 		}
 	}
 
-	update(id: number, updateCatalogRequestDto: UpdateCatalogRequestDto) {
-		return `This action updates a #${id} catalogRequest`;
+	async update(
+		id: string,
+		updateCatalogRequestDto: UpdateCatalogRequestDto,
+	): Promise<CatalogRequestEntity> {
+		const catalogRequestExists = (
+			await this.drizzleService.db
+				.select({ count: eq(catalogRequests.id, id) })
+				.from(catalogRequests)
+		)?.[0]?.count;
+
+		if (
+			typeof catalogRequestExists === 'number' &&
+			catalogRequestExists <= 0
+		) {
+			throw new NotFoundException(
+				`Catalog request with ID ${id} not found`,
+			);
+		}
+
+		try {
+			// Update the catalog request data
+			const updatedCatalogRequest = await this.drizzleService.db
+				.update(catalogRequests)
+				.set(updateCatalogRequestDto)
+				.where(eq(catalogRequests.id, id))
+				.returning();
+
+			if (!updatedCatalogRequest[0]) {
+				throw new Error('Failed to update catalog request');
+			}
+
+			return updatedCatalogRequest[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to create catalog request',
+				);
+			}
+		}
 	}
 
 	remove(id: number) {

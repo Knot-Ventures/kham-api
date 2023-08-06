@@ -9,6 +9,7 @@ import {
 	Query,
 } from '@nestjs/common';
 import {
+	ApiBody,
 	ApiOkResponse,
 	ApiOperation,
 	ApiParam,
@@ -71,12 +72,16 @@ export class CatalogRequestsController {
 	 * update specific properties
 	 * Not all properties will be allowed to change TBD
 	 */
+	@ApiOperation({ summary: 'Update a catalog request by ID' })
+	@ApiBody({ type: UpdateCatalogRequestDto })
+	@ApiOkResponse({ type: CatalogRequestEntity })
+	@ApiParam({ name: 'id', type: String })
 	@Patch(':id')
-	update(
+	async update(
 		@Param('id') id: string,
 		@Body() updateCatalogRequestDto: UpdateCatalogRequestDto,
-	) {
-		return this.catalogRequestsService.update(+id, updateCatalogRequestDto);
+	): Promise<CatalogRequestEntity> {
+		return this.catalogRequestsService.update(id, updateCatalogRequestDto);
 	}
 
 	/**
