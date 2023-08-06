@@ -88,8 +88,11 @@ export class CatalogRequestsController {
 	 *
 	 * Nullify or reject a request without delete in the database
 	 */
+	@ApiOperation({ summary: 'Remove a catalog entry from rotation by ID' })
+	@ApiParam({ name: 'id', type: String })
+	@ApiOkResponse({ type: CatalogRequestEntity })
 	@Delete(':id')
-	remove(@Param('id') id: string) {
-		return this.catalogRequestsService.remove(+id);
+	remove(@Param('id') id: string): Promise<CatalogRequestEntity> {
+		return this.catalogRequestsService.remove(id);
 	}
 }

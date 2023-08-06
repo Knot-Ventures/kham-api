@@ -54,6 +54,9 @@ export class CatalogRequestEntity implements CatalogRequestModel {
 	@ApiProperty()
 	otherItems: any;
 
+	@OptionalApiProperty()
+	isRemoved: boolean;
+
 	@OptionalApiProperty({ type: () => CatalogRequestContactInfoEntity })
 	requestContactInfo?: CatalogRequestContactInfoEntity;
 

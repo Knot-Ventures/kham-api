@@ -172,7 +172,36 @@ export class CatalogRequestsService {
 		}
 	}
 
-	remove(id: number) {
-		return `This action removes a #${id} catalogRequest`;
+	async remove(id: string): Promise<CatalogRequestEntity> {
+		const catalogEntryExists = await this.drizzleService.db
+			.select()
+			.from(catalogRequests)
+			.limit(1)
+			.where(eq(catalogRequests.id, id));
+
+		if (!catalogEntryExists[0]) {
+			throw new NotFoundException(
+				`Catalog Entry with ID ${id} not found`,
+			);
+		}
+
+		try {
+			const removedCatalog = await this.drizzleService.db
+				.update(catalogRequests)
+				.set({ isRemoved: true })
+				.where(eq(catalogRequests.id, id))
+				.returning();
+			return removedCatalog[0];
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to remove catalog request ',
+				);
+			}
+		}
 	}
 }
