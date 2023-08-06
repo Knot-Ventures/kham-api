@@ -74,8 +74,29 @@ export class CatalogRequestsService {
 		}
 	}
 
-	findAll() {
-		return `This action returns all catalogRequests`;
+	async findAll(
+		page: number,
+		limit: number,
+	): Promise<CatalogRequestEntity[]> {
+		const offset = (page - 1) * limit;
+
+		try {
+			return this.drizzleService.db
+				.select()
+				.from(catalogRequests)
+				.limit(limit)
+				.offset(offset);
+		} catch (error) {
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				throw new InternalServerErrorException(
+					error?.message ||
+						error?.response?.message ||
+						'Failed to create catalog request',
+				);
+			}
+		}
 	}
 
 	findOne(id: number) {
