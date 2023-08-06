@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
+import { OptionalApiProperty } from '../../../openapi/decorators';
 
 export class CreateVendorDto {
 	@IsString()
@@ -11,6 +12,6 @@ export class CreateVendorDto {
 	address: string;
 
 	@IsString()
-	@ApiProperty({ required: false })
+	@OptionalApiProperty()
 	image?: string;
 }
