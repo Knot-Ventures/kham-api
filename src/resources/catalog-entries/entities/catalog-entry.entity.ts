@@ -41,6 +41,9 @@ export class CatalogEntryEntity implements CatalogEntryModel {
 	@ApiProperty()
 	average_market_price: number;
 
+	@OptionalApiProperty()
+	isRemoved: boolean;
+
 	@OptionalApiProperty({ type: () => ProductEntity })
 	product?: ProductEntity;
 

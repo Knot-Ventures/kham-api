@@ -1,14 +1,15 @@
+import { relations } from 'drizzle-orm';
 import {
+	boolean,
 	doublePrecision,
 	pgTable,
 	text,
 	uuid,
 	varchar,
 } from 'drizzle-orm/pg-core';
+import catalog_request_items from './catalog_request_items';
 import products from './products';
 import vendors from './vendors';
-import { relations } from 'drizzle-orm';
-import catalog_request_items from './catalog_request_items';
 
 const catalogEntries = pgTable('catalog_entries', {
 	id: uuid('id').defaultRandom().primaryKey(),
@@ -26,6 +27,7 @@ const catalogEntries = pgTable('catalog_entries', {
 	available_qty: doublePrecision('available_qty'),
 	unit: varchar('unit', { length: 16 }),
 	average_market_price: doublePrecision('average_market_price'),
+	isRemoved: boolean('is_removed').default(false),
 });
 export default catalogEntries;
 
