@@ -1,4 +1,6 @@
+import { relations } from 'drizzle-orm';
 import {
+	boolean,
 	integer,
 	jsonb,
 	pgEnum,
@@ -7,10 +9,9 @@ import {
 	timestamp,
 	uuid,
 } from 'drizzle-orm/pg-core';
-import users from './users';
-import { relations } from 'drizzle-orm';
-import catalogRequestItems from './catalog_request_items';
 import catalogRequestContactInfo from './catalog_request_contact_info';
+import catalogRequestItems from './catalog_request_items';
+import users from './users';
 
 export const catalogRequestStatusEnum = pgEnum('catalog_requests_status', [
 	'fulfilled',
@@ -36,6 +37,7 @@ const catalogRequests = pgTable('catalog_requests', {
 	status: catalogRequestStatusEnum('status'),
 	notes: text('notes'),
 	otherItems: jsonb('other_items'),
+	isRemoved: boolean('is_removed').default(false),
 });
 
 export default catalogRequests;

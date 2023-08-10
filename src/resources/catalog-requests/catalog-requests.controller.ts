@@ -89,7 +89,6 @@ export class CatalogRequestsController {
 	 * Nullify or reject a request without delete in the database
 	 */
 
-	//need to handle migrate from catalog entry and then update entity of user catalog request
 	@ApiOperation({ summary: 'Remove a catalog entry from rotation by ID' })
 	@ApiParam({ name: 'id', type: String })
 	@ApiOkResponse({ type: CatalogRequestEntity })

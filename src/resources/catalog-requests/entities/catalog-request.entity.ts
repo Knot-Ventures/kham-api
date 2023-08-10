@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean } from 'class-validator';
 import { InferModel } from 'drizzle-orm';
 import catalogRequests from '../../../drizzle/schema/catalog_requests';
 import { EnumTypeFromMap } from '../../../helpers/EnumTypeFromMap';
@@ -54,7 +55,7 @@ export class CatalogRequestEntity implements CatalogRequestModel {
 	@ApiProperty()
 	otherItems: any;
 
-	@OptionalApiProperty()
+	@IsBoolean()
 	isRemoved: boolean;
 
 	@OptionalApiProperty({ type: () => CatalogRequestContactInfoEntity })
