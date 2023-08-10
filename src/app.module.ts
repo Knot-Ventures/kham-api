@@ -7,6 +7,7 @@ import { FirebaseModule } from './firebase/firebase.module';
 import { CatalogEntriesModule } from './resources/catalog-entries/catalog-entries.module';
 import { CatalogRequestsModule } from './resources/catalog-requests/catalog-requests.module';
 import { UsersModule } from './resources/users/users.module';
+import { DrizzleModule } from './drizzle/drizzle.module';
 
 @Module({
 	imports: [
@@ -15,9 +16,10 @@ import { UsersModule } from './resources/users/users.module';
 		FirebaseModule,
 		CatalogEntriesModule,
 		CatalogRequestsModule,
+		DrizzleModule,
 	],
 	controllers: [AppController],
-	providers: [AppService, DrizzleService],
-	exports: [DrizzleService],
+	providers: [AppService],
+	exports: [],
 })
 export class AppModule {}

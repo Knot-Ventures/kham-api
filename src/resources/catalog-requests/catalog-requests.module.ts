@@ -5,6 +5,6 @@ import { CatalogRequestsService } from './catalog-requests.service';
 
 @Module({
 	controllers: [CatalogRequestsController],
-	providers: [CatalogRequestsService, DrizzleService],
+	providers: [CatalogRequestsService],
 })
 export class CatalogRequestsModule {}
