@@ -1,15 +1,9 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-import {
-	ArrayMaxSize,
-	IsArray,
-	IsEnum,
-	IsNumber,
-	IsString,
-} from 'class-validator';
-import { CreateContactInfoDto } from './create-contact-info.dto';
-import { CreateAdminAccessDto } from './create-admin-access.dto';
+import { ArrayMaxSize, IsArray, IsEnum, IsString } from 'class-validator';
 import { OptionalApiProperty } from '../../../openapi/decorators';
 import { BusinessType, UserType } from '../entities/user.entity';
+import { CreateAdminAccessDto } from './create-admin-access.dto';
+import { CreateContactInfoDto } from './create-contact-info.dto';
 
 @ApiExtraModels(CreateAdminAccessDto, CreateContactInfoDto)
 export class CreateUserDto {
@@ -42,11 +36,11 @@ export class CreateUserDto {
 	@ApiProperty()
 	authId: string;
 
-	@IsNumber()
+	@IsString()
 	@OptionalApiProperty()
 	contactInfoId?: string;
 
-	@IsNumber()
+	@IsString()
 	@OptionalApiProperty()
 	adminAccessId?: string;
 

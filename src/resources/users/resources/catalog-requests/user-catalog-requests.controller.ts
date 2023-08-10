@@ -1,17 +1,38 @@
 import {
-	Controller,
-	Get,
-	Post,
 	Body,
-	Patch,
-	Param,
+	Controller,
 	Delete,
+	Get,
+	Param,
+	Patch,
+	Post,
+	Query,
 } from '@nestjs/common';
-import { UserCatalogRequestsService } from './user-catalog-requests.service';
-import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
-import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
+import {
+	ApiBody,
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiQuery,
+	ApiResponse,
+	ApiTags,
+} from '@nestjs/swagger';
+import { CreateCatalogRequestItemDto } from './dto/create-catalog-request-item.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ItemsDto } from './dto/items.dto';
+import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
+import { UpdateCatalogRequestItemDto } from './dto/update-catalog-request-item.dto';
+import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
+import { UpdateItemCountDto } from './dto/update-item-count.dto';
+import {
+	CatalogRequestItemEntity,
+	CatalogRequestItemsModel,
+} from './entities/catalog-request-item.entity';
+import {
+	CatalogRequestEntity,
+	CatalogRequestModel,
+} from './entities/catalog-request.entity';
+import { UserCatalogRequestsService } from './user-catalog-requests.service';
 
 @ApiTags('users-catalog-requests')
 @Controller(':uid/catalog-requests')
@@ -21,100 +42,183 @@ export class UserCatalogRequestsController {
 	) {}
 
 	/**
-	 * Authorize User
 	 * Create A catalog request ({status: 'parked'}) to allow the user to add items
 	 */
 	@Post()
-	create(@Body() createCatalogRequestDto: CreateCatalogRequestDto) {
+	create(
+		@Body() createCatalogRequestDto: CreateCatalogRequestDto,
+	): Promise<CatalogRequestModel> {
 		return this.catalogRequestsService.create(createCatalogRequestDto);
 	}
 
 	/**
-	 * Authorize User
 	 * Submit a catalog request for the user and notify Kham Sales Team
 	 */
 	@Patch()
-	submit(@Body() submitCatalogRequestDto: SubmitCatalogRequestDto) {
+	submit(
+		@Body() submitCatalogRequestDto: SubmitCatalogRequestDto,
+	): Promise<CatalogRequestModel> {
 		return this.catalogRequestsService.submit(submitCatalogRequestDto);
 	}
 
 	/**
-	 * Authorize User
 	 * get All the catalog requests for the current user
 	 * add select array to select columns from table
 	 * implement pagination
 	 */
+	@ApiOperation({ summary: 'Get all catalog requests' })
+	@ApiOkResponse({ type: CatalogRequestEntity, isArray: true })
+	@ApiQuery({ name: 'page', required: false, type: Number })
+	@ApiQuery({ name: 'limit', required: false, type: Number })
 	@Get()
-	findAll() {
-		return this.catalogRequestsService.findAll();
+	async findAll(
+		@Query('page') page = 1,
+		@Query('limit') limit = 10,
+	): Promise<CatalogRequestModel[]> {
+		return this.catalogRequestsService.findAll(page, limit);
 	}
 
 	/**
-	 * Authorize User
 	 * get the latest request that has not been pushed (ie; current cart)
 	 */
-	@Get('current')
-	findCurrent() {}
 
 	/**
-	 * Authorize User
 	 * get a specific request
 	 * with Items and Contact Info
 	 */
+	@ApiOperation({ summary: 'Get a catalog request by ID' })
+	@ApiOkResponse({ type: CatalogRequestEntity })
+	@ApiParam({ name: 'id', type: String })
 	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.catalogRequestsService.findOne(+id);
+	async findOne(@Param('id') id: string): Promise<CatalogRequestEntity> {
+		return this.catalogRequestsService.findOne(id);
 	}
 
 	/**
-	 * Authorize User
 	 * update specific properties
 	 * Not all properties will be allowed to change TBD
 	 */
+	@ApiOperation({ summary: 'Update a catalog request by ID' })
+	@ApiBody({ type: UpdateCatalogRequestDto })
+	@ApiOkResponse({ type: CatalogRequestEntity })
+	@ApiParam({ name: 'id', type: String })
 	@Patch(':id')
-	update(
+	async update(
 		@Param('id') id: string,
 		@Body() updateCatalogRequestDto: UpdateCatalogRequestDto,
-	) {
-		return this.catalogRequestsService.update(+id, updateCatalogRequestDto);
+	): Promise<CatalogRequestModel> {
+		return this.catalogRequestsService.update(id, updateCatalogRequestDto);
 	}
 
 	/**
-	 * Authorize User
 	 * validate if there's an available request to add the items to (if not then create one)
 	 * Add Items to the Request
 	 */
+	//Add Items to the Request
+	@ApiOperation({ summary: 'Add items to a catalog request' })
+	@ApiParam({ name: 'id', description: 'Catalog request ID' })
 	@Post(':id/items')
-	addItems(@Param('id') id: string) {
-		return 'not-implemented';
+	async addItemsToRequest(
+		@Param('id') requestId: string,
+		@Body() createCatalogRequestItemDto: CreateCatalogRequestItemDto,
+	): Promise<CatalogRequestItemsModel> {
+		return this.catalogRequestsService.addItemsToRequest(
+			requestId,
+			createCatalogRequestItemDto,
+		);
+	} //need to test it after create catalog entry
+
+	//add items to otherItems in catalogRequestTable
+	@Post(':id/otherItems')
+	addItems(
+		@Param('id') requestId: string,
+		@Body() addItemsDto: ItemsDto,
+	): Promise<CatalogRequestModel> {
+		return this.catalogRequestsService.addItems(requestId, addItemsDto);
 	}
 
 	/**
-	 * Authorize User
 	 * remove items from request
 	 */
+	@ApiOperation({ summary: 'Remove items from a catalog request' })
+	@ApiParam({ name: 'id', description: 'Catalog request ID' })
+	@ApiResponse({
+		status: 200,
+		description: 'Items removed successfully',
+		type: CatalogRequestItemEntity,
+	})
+	@ApiResponse({ status: 404, description: 'Catalog request not found' })
 	@Delete(':id/items')
-	removeItems(@Param('id') id: string) {
-		return 'not-implemented';
-	}
+	async removeItemsFromRequest(
+		@Param('id') requestId: string,
+	): Promise<CatalogRequestItemsModel> {
+		return this.catalogRequestsService.removeItemsFromRequest(requestId);
+	} //need to test it after create catalog entry
 
+	@Delete(':id/items')
+	async removeItems(
+		@Param('id') requestId: string,
+		@Body() removeItemsDto: ItemsDto,
+	): Promise<CatalogRequestModel> {
+		return this.catalogRequestsService.removeItems(
+			requestId,
+			removeItemsDto,
+		);
+	}
 	/**
-	 * Authorize User
 	 * Edit Items Quantity
 	 */
+	// @Patch(':id/items/:itemId')
+	// editItems(@Param('id') id: string) {
+	// 	return 'not-implemented';
+	// }
+
+	@ApiOperation({
+		summary: 'Update quantity of a specific item in a catalog request',
+	})
+	@ApiParam({ name: 'id', description: 'Catalog request ID' })
+	@ApiParam({ name: 'itemId', description: 'ID of the item to update' })
+	@ApiResponse({
+		status: 200,
+		description: 'Item quantity updated successfully',
+		type: CatalogRequestItemEntity,
+	})
+	@ApiResponse({
+		status: 404,
+		description: 'Catalog request or item not found',
+	})
 	@Patch(':id/items/:itemId')
-	editItems(@Param('id') id: string) {
-		return 'not-implemented';
+	async updateItemQuantity(
+		@Param('id') requestId: string,
+		@Param('itemId') itemId: string,
+		@Body() updateItemDto: UpdateCatalogRequestItemDto,
+	): Promise<CatalogRequestItemsModel> {
+		return this.catalogRequestsService.updateItemQuantity(
+			requestId,
+			itemId,
+			updateItemDto,
+		);
+	} //need to test
+
+	//edit items cout in catalog request
+	@Patch(':id/item-count')
+	async updateItemCount(
+		@Param('id') requestId: string,
+		@Body() updateItemCountDto: UpdateItemCountDto,
+	): Promise<CatalogRequestModel> {
+		return this.catalogRequestsService.updateItemCount(
+			requestId,
+			updateItemCountDto,
+		);
 	}
 
 	/**
-	 * Authorize User
 	 * cancel request
 	 * remove completely
 	 * only if request is pending
 	 */
 	@Delete(':id')
-	cancel(@Param('id') id: string) {
-		return this.catalogRequestsService.remove(+id);
+	async cancelCatalogRequest(@Param('id') requestId: string) {
+		return this.catalogRequestsService.cancelCatalogRequest(requestId);
 	}
 }

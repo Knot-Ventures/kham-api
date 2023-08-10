@@ -1,14 +1,7 @@
 // updateUser.dto.ts
-import { ApiProperty } from '@nestjs/swagger';
-import {
-	ArrayMaxSize,
-	IsArray,
-	IsEnum,
-	IsNumber,
-	IsString,
-} from 'class-validator';
-import { BusinessType, UserType } from '../entities/user.entity';
+import { ArrayMaxSize, IsArray, IsEnum, IsString } from 'class-validator';
 import { OptionalApiProperty } from '../../../openapi/decorators';
+import { BusinessType, UserType } from '../entities/user.entity';
 
 export class UpdateUserDto {
 	@IsString()
@@ -40,11 +33,11 @@ export class UpdateUserDto {
 	@OptionalApiProperty()
 	authId: string;
 
-	@IsNumber()
+	@IsString()
 	@OptionalApiProperty()
 	contactInfoId?: string;
 
-	@IsNumber()
+	@IsString()
 	@OptionalApiProperty()
 	adminAccessId?: string;
 }

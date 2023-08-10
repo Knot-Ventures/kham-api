@@ -1,5 +1,5 @@
 import { VERSION_NEUTRAL, VersioningType } from '@nestjs/common';
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import {
 	DocumentBuilder,
@@ -7,10 +7,10 @@ import {
 	SwaggerDocumentOptions,
 	SwaggerModule,
 } from '@nestjs/swagger';
+import * as dotenv from 'dotenv';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { AppModule } from './app.module';
-import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env', override: false });
 
