@@ -4,10 +4,11 @@ import {
 	InternalServerErrorException,
 	NotFoundException,
 } from '@nestjs/common';
-import { DrizzleError, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { DrizzleService } from '../../drizzle/drizzle.service';
 import catalogRequestContactInfo from '../../drizzle/schema/catalog_request_contact_info';
 import catalogRequests from '../../drizzle/schema/catalog_requests';
+import { handleServiceError } from '../utilities/error-handling.util';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
 import {
@@ -63,15 +64,7 @@ export class CatalogRequestsService {
 				});
 			return createdCatalogRequest;
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create catalog request',
-				);
-			}
+			handleServiceError(error, 'Failed to update catalog request ');
 		}
 	}
 
@@ -88,15 +81,7 @@ export class CatalogRequestsService {
 				.limit(limit)
 				.offset(offset);
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create catalog request',
-				);
-			}
+			handleServiceError(error, 'Failed to get all catalog requests ');
 		}
 	}
 
@@ -115,15 +100,7 @@ export class CatalogRequestsService {
 
 			return catalogRequest;
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create catalog request',
-				);
-			}
+			handleServiceError(error, 'Failed to find catalog request ');
 		}
 	}
 
@@ -160,15 +137,7 @@ export class CatalogRequestsService {
 
 			return updatedCatalogRequest[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create catalog request',
-				);
-			}
+			handleServiceError(error, 'Failed to update catalog request ');
 		}
 	}
 
@@ -193,15 +162,7 @@ export class CatalogRequestsService {
 				.returning();
 			return removedCatalog[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to remove catalog request ',
-				);
-			}
+			handleServiceError(error, 'Failed to remove catalog request ');
 		}
 	}
 }
