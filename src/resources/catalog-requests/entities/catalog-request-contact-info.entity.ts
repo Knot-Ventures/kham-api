@@ -3,7 +3,7 @@ import { InferModel } from 'drizzle-orm';
 import catalogRequestContactInfo from '../../../drizzle/schema/catalog_request_contact_info';
 import { OptionalApiProperty } from '../../../openapi/decorators';
 
-import { GeoLocation } from '../../shared/geolocation';
+import { GeoLocation } from '../../utilities/geolocation';
 export type CatalogRequestContactInfoModel = InferModel<
 	typeof catalogRequestContactInfo
 >;

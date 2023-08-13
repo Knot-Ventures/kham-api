@@ -1,7 +1,7 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsString } from 'class-validator';
 import { OptionalApiProperty } from '../../../openapi/decorators';
-import { GeoLocation } from '../entities/contact-info.entity';
+import { GeoLocation } from '../../utilities/geolocation';
 
 @ApiExtraModels(GeoLocation)
 export class CreateContactInfoDto {

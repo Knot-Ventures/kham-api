@@ -4,7 +4,6 @@ import {
 	HttpException,
 	HttpStatus,
 	Injectable,
-	InternalServerErrorException,
 	NotFoundException,
 } from '@nestjs/common';
 import { DrizzleError, eq, sql } from 'drizzle-orm';
@@ -12,6 +11,7 @@ import { DrizzleService } from '../../drizzle/drizzle.service';
 import adminAccess from '../../drizzle/schema/admin_access';
 import userContactInfo from '../../drizzle/schema/user_contact_info';
 import users from '../../drizzle/schema/users';
+import { handleServiceError } from '../utilities/error-handling.util';
 import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
 import { CreateContactInfoDto } from './dto/create-contact-info.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -52,15 +52,7 @@ export class UsersService {
 			);
 			return createdUser[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create users.',
-				);
-			}
+			handleServiceError(error, 'Failed to create user');
 		}
 	}
 
@@ -84,15 +76,7 @@ export class UsersService {
 
 			return createdUser[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create users.',
-				);
-			}
+			handleServiceError(error, 'Failed to create user');
 		}
 	}
 
@@ -107,15 +91,7 @@ export class UsersService {
 				.limit(limit)
 				.offset(offset);
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create users.',
-				);
-			}
+			handleServiceError(error, 'Failed to find users');
 		}
 	}
 
@@ -142,25 +118,12 @@ export class UsersService {
 
 			return user;
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else if (error.code === '22P02') {
+			if (error.code === '22P02') {
 				// handle specific error code
 				const errorMessage = `Invalid UUID format for User ID ${userId}`;
 				throw new BadRequestException(errorMessage);
-			} else if (error instanceof HttpException) {
-				const httpStatus = error.getStatus();
-				if (httpStatus === HttpStatus.NOT_FOUND) {
-					throw new NotFoundException('User not found');
-				}
-				throw error;
 			} else {
-				// Handle other unknown errors
-				const errorMessage =
-					error?.message ||
-					error?.response?.message ||
-					'Failed to create users.';
-				throw new InternalServerErrorException(errorMessage);
+				handleServiceError(error, 'Failed to find user');
 			}
 		}
 	}
@@ -196,15 +159,7 @@ export class UsersService {
 
 			return updatedUser[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create users.',
-				);
-			}
+			handleServiceError(error, 'Failed to update catalog request');
 		}
 	}
 
@@ -240,15 +195,7 @@ export class UsersService {
 
 			return updatedUser[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create users.',
-				);
-			}
+			handleServiceError(error, 'Failed to update user contact info');
 		}
 	}
 
@@ -275,11 +222,7 @@ export class UsersService {
 			if (error instanceof DrizzleError) {
 				console.error(error.message);
 			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to add fcm token.',
-				);
+				handleServiceError(error, 'Failed to add user FCM token');
 			}
 		}
 	}
@@ -304,11 +247,7 @@ export class UsersService {
 			if (error instanceof DrizzleError) {
 				console.error(error.message);
 			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create users.',
-				);
+				handleServiceError(error, 'Failed to deactivate user');
 			}
 		}
 	}
