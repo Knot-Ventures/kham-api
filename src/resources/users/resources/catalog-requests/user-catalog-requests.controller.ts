@@ -19,11 +19,9 @@ import {
 } from '@nestjs/swagger';
 import { CreateCatalogRequestItemDto } from './dto/create-catalog-request-item.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
-import { ItemsDto } from './dto/items.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestItemDto } from './dto/update-catalog-request-item.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
-import { UpdateItemCountDto } from './dto/update-item-count.dto';
 import {
 	CatalogRequestItemEntity,
 	CatalogRequestItemsModel,
@@ -42,6 +40,7 @@ export class UserCatalogRequestsController {
 	) {}
 
 	/**
+	 * Authorize User
 	 * Create A catalog request ({status: 'parked'}) to allow the user to add items
 	 */
 	@Post()
@@ -52,6 +51,7 @@ export class UserCatalogRequestsController {
 	}
 
 	/**
+	 * Authorize User
 	 * Submit a catalog request for the user and notify Kham Sales Team
 	 */
 	@Patch()
@@ -62,6 +62,7 @@ export class UserCatalogRequestsController {
 	}
 
 	/**
+	 * Authorize User
 	 * get All the catalog requests for the current user
 	 * add select array to select columns from table
 	 * implement pagination
@@ -79,10 +80,12 @@ export class UserCatalogRequestsController {
 	}
 
 	/**
+	 * Authorize User
 	 * get the latest request that has not been pushed (ie; current cart)
 	 */
 
 	/**
+	 * Authorize User
 	 * get a specific request
 	 * with Items and Contact Info
 	 */
@@ -95,6 +98,7 @@ export class UserCatalogRequestsController {
 	}
 
 	/**
+	 * Authorize User
 	 * update specific properties
 	 * Not all properties will be allowed to change TBD
 	 */
@@ -111,10 +115,10 @@ export class UserCatalogRequestsController {
 	}
 
 	/**
+	 * Authorize User
 	 * validate if there's an available request to add the items to (if not then create one)
 	 * Add Items to the Request
 	 */
-	//Add Items to the Request
 	@ApiOperation({ summary: 'Add items to a catalog request' })
 	@ApiParam({ name: 'id', description: 'Catalog request ID' })
 	@Post(':id/items')
@@ -126,18 +130,10 @@ export class UserCatalogRequestsController {
 			requestId,
 			createCatalogRequestItemDto,
 		);
-	} //need to test it after create catalog entry
-
-	//add items to otherItems in catalogRequestTable
-	@Post(':id/otherItems')
-	addItems(
-		@Param('id') requestId: string,
-		@Body() addItemsDto: ItemsDto,
-	): Promise<CatalogRequestModel> {
-		return this.catalogRequestsService.addItems(requestId, addItemsDto);
 	}
 
 	/**
+	 * Authorize User
 	 * remove items from request
 	 */
 	@ApiOperation({ summary: 'Remove items from a catalog request' })
@@ -153,26 +149,11 @@ export class UserCatalogRequestsController {
 		@Param('id') requestId: string,
 	): Promise<CatalogRequestItemsModel> {
 		return this.catalogRequestsService.removeItemsFromRequest(requestId);
-	} //need to test it after create catalog entry
-
-	@Delete(':id/items')
-	async removeItems(
-		@Param('id') requestId: string,
-		@Body() removeItemsDto: ItemsDto,
-	): Promise<CatalogRequestModel> {
-		return this.catalogRequestsService.removeItems(
-			requestId,
-			removeItemsDto,
-		);
 	}
+
 	/**
 	 * Edit Items Quantity
 	 */
-	// @Patch(':id/items/:itemId')
-	// editItems(@Param('id') id: string) {
-	// 	return 'not-implemented';
-	// }
-
 	@ApiOperation({
 		summary: 'Update quantity of a specific item in a catalog request',
 	})
@@ -198,21 +179,10 @@ export class UserCatalogRequestsController {
 			itemId,
 			updateItemDto,
 		);
-	} //need to test
-
-	//edit items cout in catalog request
-	@Patch(':id/item-count')
-	async updateItemCount(
-		@Param('id') requestId: string,
-		@Body() updateItemCountDto: UpdateItemCountDto,
-	): Promise<CatalogRequestModel> {
-		return this.catalogRequestsService.updateItemCount(
-			requestId,
-			updateItemCountDto,
-		);
 	}
 
 	/**
+	 * Authorize User
 	 * cancel request
 	 * remove completely
 	 * only if request is pending

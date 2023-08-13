@@ -12,7 +12,6 @@ import catalogRequestItems from '../../../../drizzle/schema/catalog_request_item
 import catalogRequests from '../../../../drizzle/schema/catalog_requests';
 import { CreateCatalogRequestItemDto } from './dto/create-catalog-request-item.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
-import { ItemsDto } from './dto/items.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestItemDto } from './dto/update-catalog-request-item.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
@@ -208,7 +207,6 @@ export class UserCatalogRequestsService {
 			if (!updatedCatalogRequest[0]) {
 				throw new Error('Failed to update catalog request');
 			}
-
 			return updatedCatalogRequest[0];
 		} catch (error) {
 			if (error instanceof DrizzleError) {
@@ -262,45 +260,7 @@ export class UserCatalogRequestsService {
 			}
 		}
 	}
-	//add item to otherItems in catalog request
-	async addItems(
-		requestId: string,
-		addItemsDto: ItemsDto,
-	): Promise<CatalogRequestModel> {
-		try {
-			// Check if the request exists
-			const catalogRequest = await this.drizzleService.db
-				.select()
-				.from(catalogRequests)
-				.limit(1)
-				.where(eq(catalogRequests.id, requestId));
-			if (!catalogRequest[0]) {
-				throw new NotFoundException(
-					`request with ID ${requestId} not found`,
-				);
-			}
 
-			const otherItemsArray = catalogRequest[0].otherItems as any[];
-			otherItemsArray.push(...addItemsDto.items);
-
-			const updated = await this.drizzleService.db
-				.update(catalogRequests)
-				.set({ otherItems: otherItemsArray })
-				.where(eq(catalogRequests.id, requestId))
-				.returning();
-			return updated[0];
-		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to add item',
-				);
-			}
-		}
-	}
 	//removeItemsFromRequest
 	async removeItemsFromRequest(
 		requestId: string,
@@ -325,51 +285,6 @@ export class UserCatalogRequestsService {
 				.returning();
 
 			return removedItems[0];
-		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to remove items from catalog request',
-				);
-			}
-		}
-	}
-
-	//remove item from otherItems in catalog request
-	async removeItems(
-		requestId: string,
-		removeItemsDto: ItemsDto,
-	): Promise<CatalogRequestModel> {
-		try {
-			// Check if the request exists
-			const catalogRequest = await this.drizzleService.db
-				.select()
-				.from(catalogRequests)
-				.limit(1)
-				.where(eq(catalogRequests.id, requestId));
-
-			if (!catalogRequest[0]) {
-				throw new NotFoundException(
-					`Request with ID ${requestId} not found.`,
-				);
-			}
-
-			// Filter out the items to remove
-			const otherItemsArray = (
-				catalogRequest[0].otherItems as string[]
-			).filter((item) => !removeItemsDto.items.includes(item));
-
-			// Update the catalog request in the database
-			const updated = await this.drizzleService.db
-				.update(catalogRequests)
-				.set({ otherItems: otherItemsArray })
-				.where(eq(catalogRequests.id, requestId))
-				.returning();
-
-			return updated[0];
 		} catch (error) {
 			if (error instanceof DrizzleError) {
 				console.error(error.message);

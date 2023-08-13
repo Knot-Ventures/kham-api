@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString } from 'class-validator';
 
 import { OptionalApiProperty } from '../../../../../openapi/decorators';
-import { GeoLocation } from '../entities/contact-info.entity';
+import { GeoLocation } from '../../../../utilities/geolocation';
 
 export class CreateContactInfoDto {
 	@IsString()

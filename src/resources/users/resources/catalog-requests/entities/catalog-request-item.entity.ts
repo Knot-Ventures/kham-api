@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { InferModel } from 'drizzle-orm';
 import catalogRequestItems from '../../../../../drizzle/schema/catalog_request_items';
+import { OptionalApiProperty } from '../../../../../openapi/decorators';
+import { CatalogEntryEntity } from '../../../../catalog-entries/entities/catalog-entry.entity';
+import { CatalogRequestEntity } from '../../../../catalog-requests/entities/catalog-request.entity';
 
 export type CatalogRequestItemsModel = InferModel<typeof catalogRequestItems>;
 
@@ -17,10 +20,10 @@ export class CatalogRequestItemEntity implements CatalogRequestItemsModel {
 	@ApiProperty()
 	quantity: number;
 
-	// // Relations
-	// @ApiProperty({ type: () => CatalogEntryModel })
-	// catalogEntry: CatalogEntryModel;
+	// Relations
+	@OptionalApiProperty({ type: () => CatalogEntryEntity })
+	catalogEntry?: CatalogEntryEntity;
 
-	// @ApiProperty({ type: () => CatalogRequestModel })
-	// catalogRequest: CatalogRequestModel;
+	@OptionalApiProperty({ type: () => CatalogRequestEntity })
+	catalogRequest?: CatalogRequestEntity;
 }

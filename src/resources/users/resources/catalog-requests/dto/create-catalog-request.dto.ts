@@ -5,7 +5,6 @@ import {
 	IsEnum,
 	IsInt,
 	IsObject,
-	IsOptional,
 	IsString,
 } from 'class-validator';
 
@@ -43,8 +42,7 @@ export class CreateCatalogRequestDto {
 	respondedAt?: Date;
 
 	@IsArray()
-	@IsOptional()
-	@ApiProperty({ isArray: true })
+	@OptionalApiProperty({ isArray: true })
 	otherItems?: any[];
 
 	@IsEnum(CatalogRequestStatusType)
@@ -52,7 +50,6 @@ export class CreateCatalogRequestDto {
 	status: CatalogRequestStatusType;
 
 	@IsString()
-	@IsOptional()
-	@ApiProperty()
+	@OptionalApiProperty()
 	notes?: string;
 }
