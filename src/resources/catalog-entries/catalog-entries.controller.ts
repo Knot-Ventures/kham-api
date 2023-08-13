@@ -30,6 +30,7 @@ export class CatalogEntriesController {
 	) {}
 
 	/**
+	 * Authorize Knot Sales/Admin
 	 * Validate Product Id, Vendor
 	 * Add a new Catalog Entry
 	 */
@@ -75,6 +76,7 @@ export class CatalogEntriesController {
 	}
 
 	/**
+	 * Authorize Knot Sales/Admin
 	 * Validate Product Id, Vendor
 	 * Edit the Catalog Entry
 	 */

@@ -1,13 +1,10 @@
-import {
-	Injectable,
-	InternalServerErrorException,
-	NotFoundException,
-} from '@nestjs/common';
-import { DrizzleError, eq } from 'drizzle-orm';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
 import { DrizzleService } from '../../drizzle/drizzle.service';
 import catalogEntries from '../../drizzle/schema/catalog_entries';
 import products from '../../drizzle/schema/products';
 import vendors from '../../drizzle/schema/vendors';
+import { handleServiceError } from '../utilities/error-handling.util';
 import { CreateCatalogEntryDto } from './dto/create-catalog-entry.dto';
 import { UpdateCatalogEntryDto } from './dto/update-catalog-entry.dto';
 import {
@@ -52,15 +49,7 @@ export class CatalogEntriesService {
 			);
 			return newCatalogEntry[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create catalog entry',
-				);
-			}
+			handleServiceError(error, 'Failed to create Catalog Entry');
 		}
 	}
 
@@ -75,15 +64,7 @@ export class CatalogEntriesService {
 				.limit(limit)
 				.offset(offset);
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to get All catalog entry',
-				);
-			}
+			handleServiceError(error, 'Failed to get all Catalog Entry');
 		}
 	}
 
@@ -107,15 +88,7 @@ export class CatalogEntriesService {
 
 			return catalogEntry;
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to find catalog entry',
-				);
-			}
+			handleServiceError(error, 'Failed get Catalog Entry');
 		}
 	}
 
@@ -150,15 +123,7 @@ export class CatalogEntriesService {
 
 			return updatedCatalogEntry[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to update catalog entry',
-				);
-			}
+			handleServiceError(error, 'Failed to update catalog Entry ');
 		}
 	}
 
@@ -183,15 +148,7 @@ export class CatalogEntriesService {
 				.returning();
 			return removedCatalog[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to remove catalog entry from rotation',
-				);
-			}
+			handleServiceError(error, 'Failed to remove catalog Entry ');
 		}
 	}
 }

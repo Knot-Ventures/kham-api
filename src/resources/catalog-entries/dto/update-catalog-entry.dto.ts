@@ -1,53 +1,53 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsArray, IsNumber, IsString } from 'class-validator';
+import { OptionalApiProperty } from '../../../openapi/decorators';
 import { ProductEntity } from '../entities/product.entity';
 import { VendorEntity } from '../entities/vendor.entity';
 
 export class UpdateCatalogEntryDto {
 	@IsString()
-	@ApiPropertyOptional()
+	@OptionalApiProperty()
 	productId?: string;
 
 	@IsString()
-	@ApiPropertyOptional()
+	@OptionalApiProperty()
 	vendorId?: string;
 
 	@IsString()
-	@ApiPropertyOptional()
+	@OptionalApiProperty()
 	description?: string;
 
 	@IsArray()
 	@IsString({ each: true })
-	@ApiPropertyOptional({ type: [String] })
+	@OptionalApiProperty({ type: [String] })
 	images?: string[];
 
 	@IsString()
-	@ApiPropertyOptional()
+	@OptionalApiProperty()
 	title?: string;
 
 	@IsString()
-	@ApiPropertyOptional()
+	@OptionalApiProperty()
 	subtitle?: string;
 
 	@IsNumber()
-	@ApiPropertyOptional()
+	@OptionalApiProperty()
 	min_qty?: number;
 
 	@IsNumber()
-	@ApiPropertyOptional()
+	@OptionalApiProperty()
 	available_qty?: number;
 
 	@IsString()
-	@ApiPropertyOptional()
+	@OptionalApiProperty()
 	unit?: string;
 
 	@IsNumber()
-	@ApiPropertyOptional()
+	@OptionalApiProperty()
 	average_market_price?: number;
 
-	@ApiPropertyOptional({ type: () => ProductEntity })
+	@OptionalApiProperty({ type: () => ProductEntity })
 	product?: ProductEntity;
 
-	@ApiPropertyOptional({ type: () => VendorEntity })
+	@OptionalApiProperty({ type: () => VendorEntity })
 	vendor?: VendorEntity;
 }

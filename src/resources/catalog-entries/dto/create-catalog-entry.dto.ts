@@ -1,5 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsNumber, IsString } from 'class-validator';
+import { OptionalApiProperty } from '../../../openapi/decorators';
 import { ProductEntity } from '../entities/product.entity';
 import { VendorEntity } from '../entities/vendor.entity';
 
@@ -45,11 +46,9 @@ export class CreateCatalogEntryDto {
 	@ApiProperty()
 	average_market_price: number;
 
-	@IsOptional()
-	@ApiPropertyOptional({ type: () => ProductEntity })
+	@OptionalApiProperty({ type: () => ProductEntity })
 	product?: ProductEntity;
 
-	@IsOptional()
-	@ApiPropertyOptional({ type: () => VendorEntity })
+	@OptionalApiProperty({ type: () => VendorEntity })
 	vendor?: VendorEntity;
 }
