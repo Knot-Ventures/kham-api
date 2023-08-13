@@ -33,6 +33,10 @@ import { UserEntity } from './entities/user.entity';
 export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
+	/**
+	 * Authorize User
+	 * Create Account
+	 */
 	@ApiOperation({ summary: 'Create a new user' })
 	@ApiCreatedResponse({
 		description: 'The user has been successfully created.',
@@ -43,7 +47,9 @@ export class UsersController {
 	}
 
 	/**
-	 * Get all users
+	 * Authorize Kham/Sales/CSR
+	 *
+	 * paginate
 	 */
 	@ApiOperation({ summary: 'Get all users' })
 	@ApiOkResponse({ type: UserEntity, isArray: true })
@@ -58,7 +64,7 @@ export class UsersController {
 	}
 
 	/**
-	 * Get a user by ID
+	 * Authorize Kham/Sales/CSR or the user with same id
 	 */
 	@ApiOperation({ summary: 'Get a user by ID' })
 	@ApiOkResponse({ type: UserEntity })
@@ -68,7 +74,8 @@ export class UsersController {
 	}
 
 	/**
-	 * Get the current user
+	 *
+	 * Authorize User and get their data from the authorization response
 	 */
 	@ApiOperation({ summary: 'Get the current user' })
 	@ApiOkResponse({ type: UserEntity })
@@ -115,7 +122,8 @@ export class UsersController {
 	}
 
 	/**
-	 * Deactivate a user
+	 *
+	 * deactivate account only
 	 */
 	@ApiOperation({ summary: 'Deactivate a user' })
 	@Delete(':uid')
