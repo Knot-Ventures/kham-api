@@ -1,0 +1,1838 @@
+{
+    "openapi": "3.0.0",
+    "paths": {
+        "/users": {
+            "post": {
+                "operationId": "Users_createUser",
+                "summary": "Create a new user",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateUserDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The user has been successfully created."
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "get": {
+                "operationId": "Users_findAll",
+                "summary": "Get all users",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UserEntity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "operationId": "Users_getUserById",
+                "summary": "Get a user by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            },
+            "patch": {
+                "operationId": "Users_updateUser",
+                "summary": "Update a user",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUserDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "default": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/users/me": {
+            "get": {
+                "operationId": "Users_getMe",
+                "summary": "Get the current user",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/users/{id}/contact-info": {
+            "patch": {
+                "operationId": "Users_updateContactInfo",
+                "summary": "Update user contact information",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateContactInfoDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/users/{id}/fcm-tokens": {
+            "post": {
+                "operationId": "Users_addFcmToken",
+                "summary": "Add a Firebase Messaging token to user profile",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddFcmTokenDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/users/{uid}": {
+            "delete": {
+                "operationId": "Users_deactivateUser",
+                "summary": "Deactivate a user",
+                "parameters": [
+                    {
+                        "name": "uid",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/{uid}/catalog-requests": {
+            "post": {
+                "operationId": "UserCatalogRequests_create",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCatalogRequestDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            },
+            "patch": {
+                "operationId": "UserCatalogRequests_submit",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubmitCatalogRequestDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            },
+            "get": {
+                "operationId": "UserCatalogRequests_findAll",
+                "summary": "Get all catalog requests",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CatalogRequestEntity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            }
+        },
+        "/{uid}/catalog-requests/{id}": {
+            "get": {
+                "operationId": "UserCatalogRequests_findOne",
+                "summary": "Get a catalog request by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatalogRequestEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            },
+            "patch": {
+                "operationId": "UserCatalogRequests_update",
+                "summary": "Update a catalog request by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCatalogRequestDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatalogRequestEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            },
+            "delete": {
+                "operationId": "UserCatalogRequests_cancelCatalogRequest",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            }
+        },
+        "/{uid}/catalog-requests/{id}/items": {
+            "post": {
+                "operationId": "UserCatalogRequests_addItemsToRequest",
+                "summary": "Add items to a catalog request",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "description": "Catalog request ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCatalogRequestItemDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            },
+            "delete": {
+                "operationId": "UserCatalogRequests_removeItems",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ItemsDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            }
+        },
+        "/{uid}/catalog-requests/{id}/otherItems": {
+            "post": {
+                "operationId": "UserCatalogRequests_addItems",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ItemsDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            }
+        },
+        "/{uid}/catalog-requests/{id}/items/{itemId}": {
+            "patch": {
+                "operationId": "UserCatalogRequests_updateItemQuantity",
+                "summary": "Update quantity of a specific item in a catalog request",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "description": "Catalog request ID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "itemId",
+                        "required": true,
+                        "in": "path",
+                        "description": "ID of the item to update",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCatalogRequestItemDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Item quantity updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatalogRequestItemEntity"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Catalog request or item not found"
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            }
+        },
+        "/{uid}/catalog-requests/{id}/item-count": {
+            "patch": {
+                "operationId": "UserCatalogRequests_updateItemCount",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateItemCountDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "users-catalog-requests"
+                ]
+            }
+        },
+        "/catalog-entries": {
+            "post": {
+                "operationId": "CatalogEntries_create",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCatalogEntryDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "default": {
+                        "description": "The catalog entry has been successfully created.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatalogEntryEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "catalog-entries"
+                ]
+            },
+            "get": {
+                "operationId": "CatalogEntries_findAll",
+                "summary": "Get all catalog entries",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CatalogEntryEntity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "catalog-entries"
+                ]
+            }
+        },
+        "/catalog-entries/{id}": {
+            "get": {
+                "operationId": "CatalogEntries_findOne",
+                "summary": "Get a catalog entry by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatalogEntryEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "catalog-entries"
+                ]
+            },
+            "patch": {
+                "operationId": "CatalogEntries_update",
+                "summary": "Update a catalog Entry by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCatalogEntryDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatalogEntryEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "catalog-entries"
+                ]
+            },
+            "delete": {
+                "operationId": "CatalogEntries_remove",
+                "summary": "Remove a catalog entry from rotation by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "catalog-entries"
+                ]
+            }
+        },
+        "/catalog-requests": {
+            "post": {
+                "operationId": "CatalogRequests_create",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCatalogRequestDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "catalog-requests"
+                ]
+            },
+            "get": {
+                "operationId": "CatalogRequests_findAll",
+                "summary": "Get all catalog requests",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CatalogRequestEntity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "catalog-requests"
+                ]
+            }
+        },
+        "/catalog-requests/{id}": {
+            "get": {
+                "operationId": "CatalogRequests_findOne",
+                "summary": "Get a catalog request by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatalogRequestEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "catalog-requests"
+                ]
+            },
+            "patch": {
+                "operationId": "CatalogRequests_update",
+                "summary": "Update a catalog request by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCatalogRequestDto"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatalogRequestEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "catalog-requests"
+                ]
+            },
+            "delete": {
+                "operationId": "CatalogRequests_remove",
+                "summary": "Remove a catalog entry from rotation by ID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatalogRequestEntity"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "catalog-requests"
+                ]
+            }
+        }
+    },
+    "info": {
+        "title": "API",
+        "description": "API DOCS",
+        "version": "1.0",
+        "contact": {}
+    },
+    "tags": [],
+    "servers": [
+        {
+            "url": "http://localhost:3000"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearer": {
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "type": "http"
+            }
+        },
+        "schemas": {
+            "CreateAdminAccessDto": {
+                "type": "object",
+                "properties": {}
+            },
+            "GeoLocation": {
+                "type": "object",
+                "properties": {
+                    "latitude": {
+                        "type": "string"
+                    },
+                    "longitude": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "latitude",
+                    "longitude"
+                ]
+            },
+            "CreateContactInfoDto": {
+                "type": "object",
+                "properties": {
+                    "governorate": {
+                        "type": "string"
+                    },
+                    "city": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "type": "string"
+                    },
+                    "phoneNumber": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "example": {
+                            "latitude": "123",
+                            "longitude": "456"
+                        },
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/GeoLocation"
+                            }
+                        ]
+                    },
+                    "default": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "governorate",
+                    "city",
+                    "address",
+                    "phoneNumber",
+                    "email"
+                ]
+            },
+            "CreateUserDto": {
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "profileImage": {
+                        "type": "string"
+                    },
+                    "userType": {
+                        "type": "string",
+                        "enum": [
+                            "individual",
+                            "business"
+                        ]
+                    },
+                    "businessType": {
+                        "type": "string",
+                        "enum": [
+                            "factory",
+                            "supplier",
+                            "restaurant"
+                        ]
+                    },
+                    "fcmTokens": {
+                        "type": "array",
+                        "items": {
+                            "type": "array"
+                        }
+                    },
+                    "authId": {
+                        "type": "string"
+                    },
+                    "contactInfoId": {
+                        "type": "string"
+                    },
+                    "adminAccessId": {
+                        "type": "string"
+                    },
+                    "isActive": {
+                        "type": "boolean"
+                    },
+                    "contactInfoData": {
+                        "$ref": "#/components/schemas/CreateContactInfoDto"
+                    },
+                    "adminAccessData": {
+                        "$ref": "#/components/schemas/CreateAdminAccessDto"
+                    }
+                },
+                "required": [
+                    "firstName",
+                    "lastName",
+                    "userType",
+                    "authId"
+                ]
+            },
+            "UserContactInfoEntity": {
+                "type": "object",
+                "properties": {
+                    "address": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "$ref": "#/components/schemas/GeoLocation"
+                    },
+                    "governorate": {
+                        "type": "string"
+                    },
+                    "phoneNumber": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "city": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "default": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
+            "AdminAccessEntity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "administrator",
+                            "customer_service",
+                            "sales",
+                            "other"
+                        ]
+                    },
+                    "permissions": {
+                        "type": "object"
+                    }
+                },
+                "required": [
+                    "id",
+                    "role",
+                    "permissions"
+                ]
+            },
+            "UserEntity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "profileImage": {
+                        "type": "string"
+                    },
+                    "userType": {
+                        "type": "string",
+                        "enum": [
+                            "individual",
+                            "business"
+                        ]
+                    },
+                    "businessType": {
+                        "type": "string",
+                        "enum": [
+                            "factory",
+                            "supplier",
+                            "restaurant"
+                        ]
+                    },
+                    "fcmTokens": {
+                        "type": "array",
+                        "items": {
+                            "type": "array"
+                        }
+                    },
+                    "authId": {
+                        "type": "string"
+                    },
+                    "contactInfoId": {
+                        "type": "string"
+                    },
+                    "contactInfo": {
+                        "$ref": "#/components/schemas/UserContactInfoEntity"
+                    },
+                    "adminAccessId": {
+                        "type": "string"
+                    },
+                    "adminAccess": {
+                        "$ref": "#/components/schemas/AdminAccessEntity"
+                    },
+                    "isActive": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "firstName",
+                    "lastName",
+                    "profileImage",
+                    "userType",
+                    "businessType",
+                    "fcmTokens",
+                    "authId",
+                    "contactInfoId",
+                    "adminAccessId",
+                    "isActive"
+                ]
+            },
+            "UserType": {
+                "type": "string",
+                "enum": [
+                    "individual",
+                    "business"
+                ]
+            },
+            "BusinessType": {
+                "type": "string",
+                "enum": [
+                    "factory",
+                    "supplier",
+                    "restaurant"
+                ]
+            },
+            "UpdateUserDto": {
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "profileImage": {
+                        "type": "string"
+                    },
+                    "userType": {
+                        "$ref": "#/components/schemas/UserType"
+                    },
+                    "businessType": {
+                        "$ref": "#/components/schemas/BusinessType"
+                    },
+                    "fcmTokens": {
+                        "type": "array",
+                        "items": {
+                            "type": "array"
+                        }
+                    },
+                    "authId": {
+                        "type": "string"
+                    },
+                    "contactInfoId": {
+                        "type": "string"
+                    },
+                    "adminAccessId": {
+                        "type": "string"
+                    }
+                }
+            },
+            "AddFcmTokenDto": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "token"
+                ]
+            },
+            "CreateCatalogRequestDto": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string"
+                    },
+                    "requestContactInfoId": {
+                        "type": "string"
+                    },
+                    "requestContactInfo": {
+                        "$ref": "#/components/schemas/CreateContactInfoDto"
+                    },
+                    "itemCount": {
+                        "type": "number"
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "submittedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "respondedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "fulfilled",
+                            "accepted",
+                            "rejected",
+                            "canceled",
+                            "voided",
+                            "pending_response",
+                            "parked"
+                        ]
+                    },
+                    "notes": {
+                        "type": "string"
+                    },
+                    "otherItems": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "required": [
+                    "userId",
+                    "itemCount",
+                    "status"
+                ]
+            },
+            "SubmitCatalogRequestDto": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string"
+                    },
+                    "requestContactInfoId": {
+                        "type": "string"
+                    },
+                    "itemCount": {
+                        "type": "number"
+                    },
+                    "otherItems": {
+                        "type": "array",
+                        "items": {
+                            "type": "array"
+                        }
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "fulfilled",
+                            "accepted",
+                            "rejected",
+                            "canceled",
+                            "voided",
+                            "pending_response",
+                            "parked"
+                        ]
+                    },
+                    "notes": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "userId",
+                    "requestContactInfoId",
+                    "itemCount",
+                    "otherItems",
+                    "status",
+                    "notes"
+                ]
+            },
+            "CatalogRequestEntity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "userId": {
+                        "type": "string"
+                    },
+                    "requestContactInfoId": {
+                        "type": "string"
+                    },
+                    "itemCount": {
+                        "type": "number"
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "submittedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "respondedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "fulfilled",
+                            "accepted",
+                            "rejected",
+                            "canceled",
+                            "voided",
+                            "pending_response",
+                            "parked"
+                        ]
+                    },
+                    "notes": {
+                        "type": "string"
+                    },
+                    "otherItems": {
+                        "type": "object"
+                    },
+                    "requestContactInfo": {
+                        "$ref": "#/components/schemas/CatalogRequestContactInfoEntity"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/UserEntity"
+                    },
+                    "catalogRequestItems": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CatalogRequestItemEntity"
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "userId",
+                    "requestContactInfoId",
+                    "itemCount",
+                    "createdAt",
+                    "submittedAt",
+                    "respondedAt",
+                    "status",
+                    "notes",
+                    "otherItems"
+                ]
+            },
+            "UpdateCatalogRequestDto": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string"
+                    },
+                    "requestContactInfoId": {
+                        "type": "string"
+                    },
+                    "itemCount": {
+                        "type": "number"
+                    },
+                    "createdAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "submittedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "respondedAt": {
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "fulfilled",
+                            "accepted",
+                            "rejected",
+                            "canceled",
+                            "voided",
+                            "pending_response",
+                            "parked"
+                        ]
+                    },
+                    "notes": {
+                        "type": "string"
+                    },
+                    "otherItems": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "CreateCatalogRequestItemDto": {
+                "type": "object",
+                "properties": {
+                    "catalog_entry_id": {
+                        "type": "string"
+                    },
+                    "catalog_request_id": {
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "catalog_entry_id",
+                    "catalog_request_id",
+                    "quantity"
+                ]
+            },
+            "ItemsDto": {
+                "type": "object",
+                "properties": {}
+            },
+            "CatalogRequestItemEntity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "catalog_entry_id": {
+                        "type": "string"
+                    },
+                    "catalog_request_id": {
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "id",
+                    "catalog_entry_id",
+                    "catalog_request_id",
+                    "quantity"
+                ]
+            },
+            "UpdateCatalogRequestItemDto": {
+                "type": "object",
+                "properties": {
+                    "quantity": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "quantity"
+                ]
+            },
+            "UpdateItemCountDto": {
+                "type": "object",
+                "properties": {
+                    "itemCount": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "itemCount"
+                ]
+            },
+            "ProductEntity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "eNumber": {
+                        "type": "string"
+                    },
+                    "otherNames": {
+                        "type": "string"
+                    },
+                    "uses": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "eNumber",
+                    "otherNames",
+                    "uses"
+                ]
+            },
+            "VendorEntity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "type": "string"
+                    },
+                    "image": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "address",
+                    "image"
+                ]
+            },
+            "CreateCatalogEntryDto": {
+                "type": "object",
+                "properties": {
+                    "productId": {
+                        "type": "string"
+                    },
+                    "vendorId": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "subtitle": {
+                        "type": "string"
+                    },
+                    "min_qty": {
+                        "type": "number"
+                    },
+                    "available_qty": {
+                        "type": "number"
+                    },
+                    "unit": {
+                        "type": "string"
+                    },
+                    "average_market_price": {
+                        "type": "number"
+                    },
+                    "product": {
+                        "$ref": "#/components/schemas/ProductEntity"
+                    },
+                    "vendor": {
+                        "$ref": "#/components/schemas/VendorEntity"
+                    }
+                },
+                "required": [
+                    "productId",
+                    "vendorId",
+                    "description",
+                    "images",
+                    "title",
+                    "subtitle",
+                    "min_qty",
+                    "available_qty",
+                    "unit",
+                    "average_market_price"
+                ]
+            },
+            "CatalogEntryEntity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "productId": {
+                        "type": "string"
+                    },
+                    "vendorId": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "subtitle": {
+                        "type": "string"
+                    },
+                    "min_qty": {
+                        "type": "number"
+                    },
+                    "available_qty": {
+                        "type": "number"
+                    },
+                    "unit": {
+                        "type": "string"
+                    },
+                    "average_market_price": {
+                        "type": "number"
+                    },
+                    "isRemoved": {
+                        "type": "boolean"
+                    },
+                    "product": {
+                        "$ref": "#/components/schemas/ProductEntity"
+                    },
+                    "vendor": {
+                        "$ref": "#/components/schemas/VendorEntity"
+                    }
+                },
+                "required": [
+                    "id",
+                    "productId",
+                    "vendorId",
+                    "description",
+                    "images",
+                    "title",
+                    "subtitle",
+                    "min_qty",
+                    "available_qty",
+                    "unit",
+                    "average_market_price"
+                ]
+            },
+            "UpdateCatalogEntryDto": {
+                "type": "object",
+                "properties": {
+                    "productId": {
+                        "type": "string"
+                    },
+                    "vendorId": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "subtitle": {
+                        "type": "string"
+                    },
+                    "min_qty": {
+                        "type": "number"
+                    },
+                    "available_qty": {
+                        "type": "number"
+                    },
+                    "unit": {
+                        "type": "string"
+                    },
+                    "average_market_price": {
+                        "type": "number"
+                    },
+                    "product": {
+                        "$ref": "#/components/schemas/ProductEntity"
+                    },
+                    "vendor": {
+                        "$ref": "#/components/schemas/VendorEntity"
+                    }
+                }
+            },
+            "CatalogRequestContactInfoEntity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "governorate": {
+                        "type": "string"
+                    },
+                    "city": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "type": "string"
+                    },
+                    "phoneNumber": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "$ref": "#/components/schemas/GeoLocation"
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            }
+        }
+    }
+}

@@ -5,7 +5,6 @@ import { Client } from 'pg';
 import * as schema from './schema/schema';
 import * as process from 'process';
 
-@Global()
 @Injectable()
 export class DrizzleService {
 	db: NodePgDatabase<typeof schema>;

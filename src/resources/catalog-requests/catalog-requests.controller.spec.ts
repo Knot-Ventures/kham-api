@@ -3,18 +3,20 @@ import { CatalogRequestsController } from './catalog-requests.controller';
 import { CatalogRequestsService } from './catalog-requests.service';
 
 describe('CatalogRequestsController', () => {
-  let controller: CatalogRequestsController;
+	let controller: CatalogRequestsController;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [CatalogRequestsController],
-      providers: [CatalogRequestsService],
-    }).compile();
+	beforeEach(async () => {
+		const module: TestingModule = await Test.createTestingModule({
+			controllers: [CatalogRequestsController],
+			providers: [CatalogRequestsService],
+		}).compile();
 
-    controller = module.get<CatalogRequestsController>(CatalogRequestsController);
-  });
+		controller = module.get<CatalogRequestsController>(
+			CatalogRequestsController,
+		);
+	});
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+	it('should be defined', () => {
+		expect(controller).toBeDefined();
+	});
 });

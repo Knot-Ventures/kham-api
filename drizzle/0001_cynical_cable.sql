@@ -1,0 +1,1 @@
+ALTER TABLE "catalog_entries" ADD COLUMN "is_removed" boolean DEFAULT false;

@@ -1,15 +1,17 @@
 /* eslint-disable prettier/prettier */
 import {
+	BadRequestException,
 	HttpException,
 	HttpStatus,
 	Injectable,
 	NotFoundException,
 } from '@nestjs/common';
-import { eq, sql } from 'drizzle-orm';
+import { DrizzleError, eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '../../drizzle/drizzle.service';
 import adminAccess from '../../drizzle/schema/admin_access';
 import userContactInfo from '../../drizzle/schema/user_contact_info';
 import users from '../../drizzle/schema/users';
+import { handleServiceError } from '../utilities/error-handling.util';
 import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
 import { CreateContactInfoDto } from './dto/create-contact-info.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -50,15 +52,7 @@ export class UsersService {
 			);
 			return createdUser[0];
 		} catch (error) {
-			throw new HttpException(
-				{
-					status:
-						error.response.status ||
-						HttpStatus.INTERNAL_SERVER_ERROR,
-					error: error.response.error || 'Something went wrong.',
-				},
-				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
-			);
+			handleServiceError(error, 'Failed to create user');
 		}
 	}
 
@@ -82,15 +76,7 @@ export class UsersService {
 
 			return createdUser[0];
 		} catch (error) {
-			throw new HttpException(
-				{
-					status:
-						error.response.status ||
-						HttpStatus.INTERNAL_SERVER_ERROR,
-					error: error.response.error || 'Failed to create user.',
-				},
-				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
-			);
+			handleServiceError(error, 'Failed to create user');
 		}
 	}
 
@@ -105,15 +91,7 @@ export class UsersService {
 				.limit(limit)
 				.offset(offset);
 		} catch (error) {
-			throw new HttpException(
-				{
-					status:
-						error.response.status ||
-						HttpStatus.INTERNAL_SERVER_ERROR,
-					error: error.response.error || 'Failed to fetch users.',
-				},
-				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
-			);
+			handleServiceError(error, 'Failed to find users');
 		}
 	}
 
@@ -140,15 +118,13 @@ export class UsersService {
 
 			return user;
 		} catch (error) {
-			throw new HttpException(
-				{
-					status:
-						error.response.status ||
-						HttpStatus.INTERNAL_SERVER_ERROR,
-					error: error.response.error || 'Failed to fetch user.',
-				},
-				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
-			);
+			if (error.code === '22P02') {
+				// handle specific error code
+				const errorMessage = `Invalid UUID format for User ID ${userId}`;
+				throw new BadRequestException(errorMessage);
+			} else {
+				handleServiceError(error, 'Failed to find user');
+			}
 		}
 	}
 
@@ -183,16 +159,7 @@ export class UsersService {
 
 			return updatedUser[0];
 		} catch (error) {
-			throw new HttpException(
-				{
-					status:
-						error.response.status ||
-						HttpStatus.INTERNAL_SERVER_ERROR,
-					error:
-						error.response.error || 'Failed to update user data.',
-				},
-				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
-			);
+			handleServiceError(error, 'Failed to update catalog request');
 		}
 	}
 
@@ -213,13 +180,13 @@ export class UsersService {
 	// Add contact information to user
 	async addUserContactInfo(id: string, contactInfoDto: CreateContactInfoDto) {
 		const existingUser = await this.userIdExists(id);
-		const contactInfoId = existingUser[0].contactInfoId;
+		const userContactInfoId = existingUser.contactInfoId;
 		try {
 			// Update contact info *from userContactInfo table
 			const updatedUser = await this.drizzleService.db
 				.update(userContactInfo)
 				.set(contactInfoDto)
-				.where(eq(contactInfoId, userContactInfo.id))
+				.where(eq(userContactInfo.id, userContactInfoId))
 				.returning();
 
 			if (!updatedUser[0]) {
@@ -228,17 +195,7 @@ export class UsersService {
 
 			return updatedUser[0];
 		} catch (error) {
-			throw new HttpException(
-				{
-					status:
-						error.response.status ||
-						HttpStatus.INTERNAL_SERVER_ERROR,
-					error:
-						error.response.error ||
-						'Failed to update user contact info',
-				},
-				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
-			);
+			handleServiceError(error, 'Failed to update user contact info');
 		}
 	}
 
@@ -249,14 +206,11 @@ export class UsersService {
 			const updatedUser = await this.drizzleService.db
 				.update(users)
 				.set({
-					fcmTokens: [
-						...existingUser[0].fcmTokens,
-						fcmTokenData.token,
-					],
+					fcmTokens: [...existingUser.fcmTokens, fcmTokenData.token],
 				})
 				// .set({
-				// 	fcmTokens: sql`ARRAY_APPEND(${users.fcmTokens}, '${fcmTokenData.token}')`,
-				// })not working
+				// 	fcmTokens: sql`ARRAY_APPEND(${existingUser.fcmTokens}, '${fcmTokenData.token}')`,
+				// }) function array_append(record, unknown) does not exist
 				.where(eq(users.id, id))
 				.returning();
 			if (!updatedUser[0]) {
@@ -265,15 +219,11 @@ export class UsersService {
 
 			return updatedUser[0];
 		} catch (error) {
-			throw new HttpException(
-				{
-					status:
-						error.response.status ||
-						HttpStatus.INTERNAL_SERVER_ERROR,
-					error: error.response.error || 'Failed to add fcm token.',
-				},
-				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
-			);
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				handleServiceError(error, 'Failed to add user FCM token');
+			}
 		}
 	}
 
@@ -294,15 +244,11 @@ export class UsersService {
 
 			return deactivatedUser[0];
 		} catch (error) {
-			throw new HttpException(
-				{
-					status:
-						error.response.status ||
-						HttpStatus.INTERNAL_SERVER_ERROR,
-					error: error.response.error || 'Failed to deActivate user.',
-				},
-				error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
-			);
+			if (error instanceof DrizzleError) {
+				console.error(error.message);
+			} else {
+				handleServiceError(error, 'Failed to deactivate user');
+			}
 		}
 	}
 }

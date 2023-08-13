@@ -8,6 +8,20 @@
       "when": 1690469687862,
       "tag": "0000_flaky_joystick",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1691065655859,
+      "tag": "0001_cynical_cable",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1691668634395,
+      "tag": "0002_long_diamondback",
+      "breakpoints": true
     }
   ]
 }
