@@ -10,12 +10,12 @@ import { DrizzleService } from '../../../../drizzle/drizzle.service';
 import catalogRequestContactInfo from '../../../../drizzle/schema/catalog_request_contact_info';
 import catalogRequestItems from '../../../../drizzle/schema/catalog_request_items';
 import catalogRequests from '../../../../drizzle/schema/catalog_requests';
+import { handleServiceError } from '../../../utilities/error-handling.util';
 import { CreateCatalogRequestItemDto } from './dto/create-catalog-request-item.dto';
 import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
 import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
 import { UpdateCatalogRequestItemDto } from './dto/update-catalog-request-item.dto';
 import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
-import { UpdateItemCountDto } from './dto/update-item-count.dto';
 import { CatalogRequestItemsModel } from './entities/catalog-request-item.entity';
 import {
 	CatalogRequestEntity,
@@ -66,15 +66,7 @@ export class UserCatalogRequestsService {
 				});
 			return createdCatalogRequest;
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create catalog request',
-				);
-			}
+			handleServiceError(error, 'Failed to create catalog request');
 		}
 	}
 	//submit
@@ -113,15 +105,7 @@ export class UserCatalogRequestsService {
 
 			return updatedCatalogRequest[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create catalog request',
-				);
-			}
+			handleServiceError(error, 'Failed to submit catalog request');
 		}
 	}
 	//get All
@@ -165,15 +149,7 @@ export class UserCatalogRequestsService {
 
 			return catalogRequest;
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create catalog request',
-				);
-			}
+			handleServiceError(error, 'Failed to create catalog request');
 		}
 	}
 	//update
@@ -209,15 +185,7 @@ export class UserCatalogRequestsService {
 			}
 			return updatedCatalogRequest[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to create catalog request',
-				);
-			}
+			handleServiceError(error, 'Failed to update catalog request');
 		}
 	}
 	//add item to catalogRequestItem
@@ -249,15 +217,10 @@ export class UserCatalogRequestsService {
 
 			return newItem[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to add item to catalogRequestItem',
-				);
-			}
+			handleServiceError(
+				error,
+				'Failed to add item to catalogRequestItem',
+			);
 		}
 	}
 
@@ -286,15 +249,7 @@ export class UserCatalogRequestsService {
 
 			return removedItems[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to remove items from catalog request',
-				);
-			}
+			handleServiceError(error, 'Failed to remove item');
 		}
 	}
 
@@ -332,54 +287,7 @@ export class UserCatalogRequestsService {
 
 			return updatedItem[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to update item count for catalog request',
-				);
-			}
-		}
-	}
-
-	async updateItemCount(
-		requestId: string,
-		updateItemCountDto: UpdateItemCountDto,
-	): Promise<CatalogRequestModel> {
-		try {
-			// Check if the request exists
-			const catalogRequest = await this.drizzleService.db
-				.select()
-				.from(catalogRequests)
-				.limit(1)
-				.where(eq(catalogRequests.id, requestId));
-
-			if (!catalogRequest[0]) {
-				throw new NotFoundException(
-					`Request with ID ${requestId} not found.`,
-				);
-			}
-
-			// Update the catalog request's item count in the database
-			const updated = await this.drizzleService.db
-				.update(catalogRequests)
-				.set({ itemCount: updateItemCountDto.itemCount })
-				.where(eq(catalogRequests.id, requestId))
-				.returning();
-
-			return updated[0];
-		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to update item count for catalog request',
-				);
-			}
+			handleServiceError(error, 'Failed to update item count');
 		}
 	}
 
@@ -415,15 +323,7 @@ export class UserCatalogRequestsService {
 
 			return deletedRequest[0];
 		} catch (error) {
-			if (error instanceof DrizzleError) {
-				console.error(error.message);
-			} else {
-				throw new InternalServerErrorException(
-					error?.message ||
-						error?.response?.message ||
-						'Failed to cancel and remove catalog request.',
-				);
-			}
+			handleServiceError(error, 'Failed to delete catalogRequest');
 		}
 	}
 }
