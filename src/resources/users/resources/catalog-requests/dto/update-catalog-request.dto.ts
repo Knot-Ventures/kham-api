@@ -1,35 +1,29 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsString } from 'class-validator';
+import { OptionalApiProperty } from '../../../../../openapi/decorators';
 import { CatalogRequestStatusType } from '../entities/catalog-request.entity';
 
 export class UpdateCatalogRequestDto {
 	@IsString()
-	@IsOptional()
-	@ApiProperty()
+	@OptionalApiProperty()
 	userId?: string;
 
 	@IsString()
-	@IsOptional()
-	@ApiProperty()
+	@OptionalApiProperty()
 	requestContactInfoId?: string;
 
 	@IsInt()
-	@IsOptional()
-	@ApiProperty()
+	@OptionalApiProperty()
 	itemCount?: number;
 
 	@IsArray()
-	@IsOptional()
-	@ApiProperty({ isArray: true })
+	@OptionalApiProperty({ isArray: true })
 	otherItems?: any[];
 
 	@IsEnum(CatalogRequestStatusType)
-	@IsOptional()
-	@ApiProperty({ enum: CatalogRequestStatusType })
+	@OptionalApiProperty({ enum: CatalogRequestStatusType })
 	status?: CatalogRequestStatusType;
 
 	@IsString()
-	@IsOptional()
-	@ApiProperty()
+	@OptionalApiProperty()
 	notes?: string;
 }

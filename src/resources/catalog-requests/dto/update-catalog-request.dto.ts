@@ -1,12 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import {
-	IsArray,
-	IsDate,
-	IsEnum,
-	IsInt,
-	IsOptional,
-	IsString,
-} from 'class-validator';
+import { IsArray, IsDate, IsEnum, IsInt, IsString } from 'class-validator';
+import { OptionalApiProperty } from '../../../openapi/decorators';
 
 import { CatalogRequestStatusType } from '../entities/catalog-request.entity';
 export class UpdateCatalogRequestDto {
@@ -39,12 +33,10 @@ export class UpdateCatalogRequestDto {
 	status?: CatalogRequestStatusType;
 
 	@IsString()
-	@IsOptional()
-	@ApiPropertyOptional()
+	@OptionalApiProperty()
 	notes?: string;
 
 	@IsArray()
-	@IsOptional()
-	@ApiPropertyOptional({ type: [Object] })
+	@OptionalApiProperty({ type: [Object] })
 	otherItems?: any[];
 }

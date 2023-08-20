@@ -58,6 +58,9 @@ export class CatalogRequestEntity
 	@ApiProperty()
 	otherItems: any;
 
+	@ApiProperty()
+	isRemoved: boolean;
+
 	// @OptionalApiProperty({ type: () => CatalogRequestContactInfoEntity })
 	// requestContactInfo: CatalogRequestContactInfoEntity;
 }

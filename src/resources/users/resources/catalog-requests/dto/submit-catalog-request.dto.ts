@@ -1,12 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-	IsArray,
-	IsEnum,
-	IsInt,
-	IsNotEmpty,
-	IsOptional,
-	IsString,
-} from 'class-validator';
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { OptionalApiProperty } from '../../../../../openapi/decorators';
+
 import { CatalogRequestStatusType } from '../entities/catalog-request.entity';
 
 export class SubmitCatalogRequestDto {
@@ -30,8 +25,7 @@ export class SubmitCatalogRequestDto {
 	itemCount: number;
 
 	@IsArray()
-	@IsOptional()
-	@ApiProperty({ isArray: true })
+	@OptionalApiProperty({ isArray: true })
 	otherItems?: any[];
 
 	@IsEnum(CatalogRequestStatusType)
@@ -39,7 +33,6 @@ export class SubmitCatalogRequestDto {
 	status: CatalogRequestStatusType;
 
 	@IsString()
-	@IsOptional()
-	@ApiProperty()
+	@OptionalApiProperty()
 	notes?: string;
 }
