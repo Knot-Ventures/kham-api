@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { DrizzleError, eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '../../drizzle/drizzle.service';
-import adminAccess from '../../drizzle/schema/admin_access';
 import userContactInfo from '../../drizzle/schema/user_contact_info';
 import users from '../../drizzle/schema/users';
 import { handleServiceError } from '../utilities/error-handling.util';
@@ -17,6 +16,7 @@ import { CreateContactInfoDto } from './dto/create-contact-info.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
+import { PgInsertValue } from 'drizzle-orm/pg-core';
 
 @Injectable()
 export class UsersService {
@@ -25,32 +25,29 @@ export class UsersService {
 	// Create a new user with contactInfo and Admin Access
 	async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
 		try {
-			const createdUser = await this.drizzleService.db.transaction(
-				async (tx) => {
-					const { contactInfoData, adminAccessData, ...userData } =
-						createUserDto;
-					if (contactInfoData) {
-						const contactInfo = await tx
-							.insert(userContactInfo)
-							.values(contactInfoData)
-							.returning();
-						userData.contactInfoId = contactInfo[0].id;
-					}
-					if (adminAccessData) {
-						const userAdminAccess = await tx
-							.insert(adminAccess)
-							.values(adminAccessData)
-							.returning();
-						userData.adminAccessId = userAdminAccess[0].id;
-					}
-					const user = await tx
-						.insert(users)
-						.values(userData)
+			return await this.drizzleService.db.transaction(async (tx) => {
+				const { contactInfoData, ...userData } = createUserDto;
+				const insertedData: PgInsertValue<typeof users> = {
+					...userData,
+				};
+
+				const user = await tx
+					.insert(users)
+					.values(insertedData)
+					.returning();
+
+				if (contactInfoData) {
+					await tx
+						.insert(userContactInfo)
+						.values({
+							...contactInfoData,
+							userId: user[0].id,
+							default: true,
+						})
 						.returning();
-					return user;
-				},
-			);
-			return createdUser[0];
+				}
+				return user[0];
+			});
 		} catch (error) {
 			handleServiceError(error, 'Failed to create user');
 		}
@@ -127,6 +124,40 @@ export class UsersService {
 			}
 		}
 	}
+	// Find a user by ID (with his contact info and admin access)
+	async findOneByAuthId(userId: string): Promise<UserEntity> {
+		try {
+			const user = await this.drizzleService.db.query.users
+				.findFirst({
+					where: eq(users.authId, userId),
+					with: {
+						contactInfo: true,
+						adminAccess: true,
+					},
+				})
+				.execute();
+
+			if (!user) {
+				throw new HttpException(
+					{
+						status: HttpStatus.NOT_FOUND,
+						error: 'User not found.',
+					},
+					HttpStatus.NOT_FOUND,
+				);
+			}
+
+			return user;
+		} catch (error) {
+			if (error.code === '22P02') {
+				// handle specific error code
+				const errorMessage = `Invalid UUID format for User ID ${userId}`;
+				throw new BadRequestException(errorMessage);
+			} else {
+				handleServiceError(error, 'Failed to find user');
+			}
+		}
+	}
 
 	// Update user data
 	async updateUser(id: string, userData: UpdateUserDto) {
@@ -178,15 +209,19 @@ export class UsersService {
 	}
 
 	// Add contact information to user
-	async addUserContactInfo(id: string, contactInfoDto: CreateContactInfoDto) {
-		const existingUser = await this.userIdExists(id);
-		const userContactInfoId = existingUser.contactInfoId;
+	async updateUserContactInfo(
+		id: string,
+		contactInfoId: string,
+		contactInfoDto: CreateContactInfoDto,
+	) {
+		await this.userIdExists(id);
+
 		try {
 			// Update contact info *from userContactInfo table
 			const updatedUser = await this.drizzleService.db
 				.update(userContactInfo)
 				.set(contactInfoDto)
-				.where(eq(userContactInfo.id, userContactInfoId))
+				.where(eq(userContactInfo.id, contactInfoId))
 				.returning();
 
 			if (!updatedUser[0]) {
@@ -201,16 +236,13 @@ export class UsersService {
 
 	// Add FCM token
 	async addFcmToken(id: string, fcmTokenData: AddFcmTokenDto) {
-		const existingUser = await this.userIdExists(id);
+		await this.userIdExists(id);
 		try {
 			const updatedUser = await this.drizzleService.db
 				.update(users)
 				.set({
-					fcmTokens: [...existingUser.fcmTokens, fcmTokenData.token],
+					fcmTokens: sql`ARRAY_APPEND(${users.fcmTokens}, ${fcmTokenData.token})`,
 				})
-				// .set({
-				// 	fcmTokens: sql`ARRAY_APPEND(${existingUser.fcmTokens}, '${fcmTokenData.token}')`,
-				// }) function array_append(record, unknown) does not exist
 				.where(eq(users.id, id))
 				.returning();
 			if (!updatedUser[0]) {
@@ -229,7 +261,7 @@ export class UsersService {
 
 	async deactivateUser(id: string) {
 		// Check if the user with the given id exists
-		const userExists = await this.userIdExists(id);
+		await this.userIdExists(id);
 		try {
 			// Deactivate the user
 			const deactivatedUser = await this.drizzleService.db

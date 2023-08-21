@@ -1,33 +1,32 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsEmail, IsString } from 'class-validator';
 import { OptionalApiProperty } from '../../../openapi/decorators';
-import { GeoLocation } from '../../utilities/geolocation';
+import { GeoLocation } from '../../../data/geolocation';
 
 @ApiExtraModels(GeoLocation)
 export class CreateContactInfoDto {
 	@IsString()
-	@ApiProperty()
+	@ApiProperty({ example: 'Cairo' })
 	governorate: string;
 
 	@IsString()
-	@ApiProperty()
+	@ApiProperty({ example: 'Nasr City' })
 	city: string;
 
 	@IsString()
-	@ApiProperty()
+	@ApiProperty({ example: '1st Area, Bld.02, Apt.01' })
 	address: string;
 
 	@IsString()
-	@ApiProperty()
+	@ApiProperty({ example: '+20-123-456-7890' })
 	phoneNumber: string;
 
 	@IsEmail()
-	@ApiProperty()
+	@ApiProperty({ example: 'john.doe@kham.shop' })
 	email: string;
 
 	@OptionalApiProperty({
 		type: () => GeoLocation,
-		example: { latitude: '123', longitude: '456' },
 	})
 	location?: GeoLocation;
 

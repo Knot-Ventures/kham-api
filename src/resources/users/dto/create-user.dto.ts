@@ -4,23 +4,24 @@ import { OptionalApiProperty } from '../../../openapi/decorators';
 import { BusinessType, UserType } from '../entities/user.entity';
 import { CreateAdminAccessDto } from './create-admin-access.dto';
 import { CreateContactInfoDto } from './create-contact-info.dto';
+import * as uuid from 'uuid';
 
 @ApiExtraModels(CreateAdminAccessDto, CreateContactInfoDto)
 export class CreateUserDto {
 	@IsString()
-	@ApiProperty()
-	firstName: string;
+	@ApiProperty({ example: 'John' })
+	firstName?: string;
 
 	@IsString()
-	@ApiProperty()
-	lastName: string;
+	@ApiProperty({ example: 'Doe' })
+	lastName?: string;
 
 	@IsString()
 	@OptionalApiProperty()
 	profileImage?: string;
 
 	@IsEnum(UserType)
-	@ApiProperty({ enum: UserType, required: true })
+	@ApiProperty({ enum: UserType })
 	userType: UserType;
 
 	@IsEnum(BusinessType)
@@ -28,28 +29,22 @@ export class CreateUserDto {
 	businessType?: BusinessType;
 
 	@IsArray()
-	@ArrayMaxSize(256)
-	@OptionalApiProperty({ isArray: true })
+	@ArrayMaxSize(1)
+	@OptionalApiProperty({
+		isArray: true,
+		example: [
+			'c2aK9KHmw8E:APA91bF7MY9bNnvGAXgbHN58lyDxc9KnuXNXwsqUs4uV4GyeF06HM1hMm-etu63S_4C-GnEtHAxJPJJC4H__VcIk90A69qQz65toFejxyncceg0_j5xwoFWvPQ5pzKo69rUnuCl1GSSv',
+		],
+	})
 	fcmTokens?: string[];
 
 	@IsString()
-	@ApiProperty()
+	@ApiProperty({ example: uuid.v1() })
 	authId: string;
-
-	@IsString()
-	@OptionalApiProperty()
-	contactInfoId?: string;
-
-	@IsString()
-	@OptionalApiProperty()
-	adminAccessId?: string;
 
 	@OptionalApiProperty()
 	isActive?: boolean;
 
 	@OptionalApiProperty({ type: () => CreateContactInfoDto })
 	contactInfoData?: CreateContactInfoDto;
-
-	@OptionalApiProperty({ type: () => CreateAdminAccessDto })
-	adminAccessData?: CreateAdminAccessDto;
 }

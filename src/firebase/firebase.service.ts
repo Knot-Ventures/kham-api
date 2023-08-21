@@ -16,17 +16,19 @@ export class FirebaseService {
 		return this._messaging;
 	}
 
-	async signin({ email, password }) {
-		return axios.post(
-			`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(
-				process.env.FIREBASE_WEB_API_KEY,
-			)}`,
-			{
-				email,
-				password,
-				returnSecureToken: true,
-			},
-		);
+	async signIn({ email, password }) {
+		return (
+			await axios.post(
+				`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(
+					process.env.FIREBASE_WEB_API_KEY,
+				)}`,
+				{
+					email,
+					password,
+					returnSecureToken: true,
+				},
+			)
+		).data;
 	}
 
 	constructor() {

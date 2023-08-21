@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS "catalog_entries" (
 	"min_qty" double precision,
 	"available_qty" double precision,
 	"unit" varchar(16),
-	"average_market_price" double precision
+	"average_market_price" double precision,
+	"is_removed" boolean DEFAULT false
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "catalog_request_contact_info" (
@@ -69,7 +70,8 @@ CREATE TABLE IF NOT EXISTS "catalog_requests" (
 	"responded_at" timestamp,
 	"status" "catalog_requests_status",
 	"notes" text,
-	"other_items" jsonb
+	"other_items" jsonb,
+	"is_removed" boolean DEFAULT false
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "products" (
@@ -86,7 +88,6 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"last_name" text,
 	"profile_image" varchar(256),
 	"auth_id" varchar(256) NOT NULL,
-	"contact_info_id" uuid,
 	"fcm_tokens" varchar(256)[],
 	"user_type" "user_type",
 	"business_type" "business_entity_type",
@@ -96,6 +97,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_contact_info" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
 	"governorate" text,
 	"city" text,
 	"address" text,
@@ -149,13 +151,13 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "users" ADD CONSTRAINT "users_contact_info_id_user_contact_info_id_fk" FOREIGN KEY ("contact_info_id") REFERENCES "user_contact_info"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "users" ADD CONSTRAINT "users_admin_access_id_admin_access_id_fk" FOREIGN KEY ("admin_access_id") REFERENCES "admin_access"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "users" ADD CONSTRAINT "users_admin_access_id_admin_access_id_fk" FOREIGN KEY ("admin_access_id") REFERENCES "admin_access"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "user_contact_info" ADD CONSTRAINT "user_contact_info_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

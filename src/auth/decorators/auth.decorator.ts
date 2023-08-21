@@ -8,7 +8,7 @@ export function Auth(...roles: string[]) {
 
 	const decorators = [SetMetadata('roles', roles), ApiBearerAuth()];
 
-	if (isProduction) {
+	if (isProduction || true) {
 		decorators.push(UseGuards(FirebaseAuthGuard, RolesGuard));
 	}
 

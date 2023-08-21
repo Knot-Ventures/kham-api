@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "77cc5db6-0405-42a0-a655-ffa2d8551b36",
+  "id": "f91b29f4-722a-4d86-a6ac-9fdba79f0dc7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "admin_access": {
@@ -102,6 +102,13 @@
           "type": "double precision",
           "primaryKey": false,
           "notNull": false
+        },
+        "is_removed": {
+          "name": "is_removed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         }
       },
       "indexes": {},
@@ -312,6 +319,13 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false
+        },
+        "is_removed": {
+          "name": "is_removed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         }
       },
       "indexes": {},
@@ -420,12 +434,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "contact_info_id": {
-          "name": "contact_info_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
         "fcm_tokens": {
           "name": "fcm_tokens",
           "type": "varchar(256)[]",
@@ -460,19 +468,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "users_contact_info_id_user_contact_info_id_fk": {
-          "name": "users_contact_info_id_user_contact_info_id_fk",
-          "tableFrom": "users",
-          "tableTo": "user_contact_info",
-          "columnsFrom": [
-            "contact_info_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "users_admin_access_id_admin_access_id_fk": {
           "name": "users_admin_access_id_admin_access_id_fk",
           "tableFrom": "users",
@@ -499,6 +494,12 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
         },
         "governorate": {
           "name": "governorate",
@@ -545,7 +546,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "user_contact_info_user_id_users_id_fk": {
+          "name": "user_contact_info_user_id_users_id_fk",
+          "tableFrom": "user_contact_info",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {}
     },
     "vendors": {

@@ -2,6 +2,7 @@ import {
 	Body,
 	Controller,
 	Delete,
+	ForbiddenException,
 	Get,
 	Param,
 	Patch,
@@ -26,6 +27,8 @@ import { AddFcmTokenDto } from './dto/add-fcm-token.dto';
 import { CreateContactInfoDto } from './dto/create-contact-info.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entities/user.entity';
+import { FindAllUsersResponseDto } from './dto/find-all-users-response.dto';
+import { Request } from 'express';
 
 @ApiTags('users')
 @Controller('users')
@@ -42,7 +45,12 @@ export class UsersController {
 		description: 'The user has been successfully created.',
 	})
 	@Post()
-	async createUser(@Body() dto: CreateUserDto): Promise<UserEntity> {
+	async createUser(
+		@Body() dto: CreateUserDto,
+		@Req() request: Request,
+	): Promise<UserEntity> {
+		if (dto.authId !== request.user.firebaseUser.uid)
+			throw new ForbiddenException();
 		return this.usersService.createUser(dto);
 	}
 
@@ -52,25 +60,19 @@ export class UsersController {
 	 * paginate
 	 */
 	@ApiOperation({ summary: 'Get all users' })
-	@ApiOkResponse({ type: UserEntity, isArray: true })
+	@ApiOkResponse({ type: FindAllUsersResponseDto })
 	@ApiQuery({ name: 'page', required: false, type: Number })
 	@ApiQuery({ name: 'limit', required: false, type: Number })
 	@Get()
 	async findAll(
 		@Query('page') page = 1,
 		@Query('limit') limit = 10,
-	): Promise<UserEntity[]> {
-		return this.usersService.findAll(page, limit);
-	}
-
-	/**
-	 * Authorize Kham/Sales/CSR or the user with same id
-	 */
-	@ApiOperation({ summary: 'Get a user by ID' })
-	@ApiOkResponse({ type: UserEntity })
-	@Get(':id')
-	async getUserById(@Param('id') id: string): Promise<UserEntity> {
-		return this.usersService.findOne(id);
+	): Promise<FindAllUsersResponseDto> {
+		return {
+			limit,
+			page,
+			data: await this.usersService.findAll(page, limit),
+		};
 	}
 
 	/**
@@ -81,8 +83,17 @@ export class UsersController {
 	@ApiOkResponse({ type: UserEntity })
 	@Get('me')
 	async getMe(@Req() request: Request) {
-		//const userId = request.user.id; // assuming the user id is available in the request
-		// return this.usersService.findOne(userId);
+		return request.user?.data;
+	}
+
+	/**
+	 * Authorize Kham/Sales/CSR or the user with same id
+	 */
+	@ApiOperation({ summary: 'Get a user by ID' })
+	@ApiOkResponse({ type: UserEntity })
+	@Get(':id')
+	async getUserById(@Param('id') id: string): Promise<UserEntity> {
+		return this.usersService.findOne(id);
 	}
 
 	/**
@@ -100,12 +111,17 @@ export class UsersController {
 	 */
 	@ApiOperation({ summary: 'Update user contact information' })
 	@ApiBody({ type: CreateContactInfoDto })
-	@Patch(':id/contact-info')
+	@Patch(':id/contact-info/:contactInfoId')
 	async updateContactInfo(
 		@Param('id') id: string,
+		@Param('contactInfoId') contactInfoId: string,
 		@Body() contactInfoDto: CreateContactInfoDto,
 	) {
-		return await this.usersService.addUserContactInfo(id, contactInfoDto);
+		return await this.usersService.updateUserContactInfo(
+			id,
+			contactInfoId,
+			contactInfoDto,
+		);
 	}
 
 	/**

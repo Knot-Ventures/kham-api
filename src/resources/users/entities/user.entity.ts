@@ -5,6 +5,7 @@ import { EnumTypeFromMap } from '../../../helpers/EnumTypeFromMap';
 import { OptionalApiProperty } from '../../../openapi/decorators';
 import { AdminAccessEntity } from './admin-access.entity';
 import { UserContactInfoEntity } from './contact-info.entity';
+import * as uuid from 'uuid';
 
 export const UserType = {
 	Individual: 'individual',
@@ -26,42 +27,46 @@ export class UserEntity
 	implements
 		Partial<
 			UserModel & {
-				userContactInfo: UserContactInfoEntity;
+				userContactInfo: UserContactInfoEntity[];
 				adminAccess: AdminAccessEntity;
 			}
 		>
 {
-	@ApiProperty()
+	@ApiProperty({
+		example: uuid.v1(),
+	})
 	id: string;
 
-	@ApiProperty()
+	@ApiProperty({ example: 'John' })
 	firstName: string;
 
-	@ApiProperty()
+	@ApiProperty({ example: 'Doe' })
 	lastName: string;
 
-	@ApiProperty()
-	profileImage: string;
+	@OptionalApiProperty()
+	profileImage?: string;
 
 	@ApiProperty({ enum: UserType })
 	userType: UserType;
 
-	@ApiProperty({ enum: BusinessType })
-	businessType: BusinessType;
+	@OptionalApiProperty({ enum: BusinessType })
+	businessType?: BusinessType;
 
-	@ApiProperty({ isArray: true })
-	fcmTokens: string[];
+	@OptionalApiProperty({
+		isArray: true,
+		example: [
+			'c2aK9KHmw8E:APA91bF7MY9bNnvGAXgbHN58lyDxc9KnuXNXwsqUs4uV4GyeF06HM1hMm-etu63S_4C-GnEtHAxJPJJC4H__VcIk90A69qQz65toFejxyncceg0_j5xwoFWvPQ5pzKo69rUnuCl1GSSv',
+		],
+	})
+	fcmTokens?: string[];
 
-	@ApiProperty()
+	@ApiProperty({ example: uuid.v1() })
 	authId: string;
 
-	@ApiProperty()
-	contactInfoId: string;
+	@OptionalApiProperty({ type: () => UserContactInfoEntity, isArray: true })
+	contactInfo?: UserContactInfoEntity[];
 
-	@OptionalApiProperty({ type: () => UserContactInfoEntity })
-	contactInfo?: UserContactInfoEntity;
-
-	@ApiProperty()
+	@OptionalApiProperty({ example: uuid.v1() })
 	adminAccessId: string;
 
 	@OptionalApiProperty({ type: () => AdminAccessEntity })

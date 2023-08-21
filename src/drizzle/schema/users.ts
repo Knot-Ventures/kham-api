@@ -27,9 +27,6 @@ const users = pgTable('users', {
 	lastName: text('last_name'),
 	profileImage: varchar('profile_image', { length: 256 }),
 	authId: varchar('auth_id', { length: 256 }).notNull(),
-	contactInfoId: uuid('contact_info_id').references(
-		() => users_contact_info.id,
-	),
 	fcmTokens: varchar('fcm_tokens', { length: 256 }).array(),
 	userType: userTypeEnum('user_type'),
 	businessType: businessEntityTypeEnum('business_type'),

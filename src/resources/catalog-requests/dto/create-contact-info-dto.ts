@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString } from 'class-validator';
 
 import { OptionalApiProperty } from '../../../openapi/decorators';
-import { GeoLocation } from '../../utilities/geolocation';
+import { GeoLocation } from '../../../data/geolocation';
 
 export class CreateContactInfoDto {
 	@IsString()
@@ -27,7 +27,6 @@ export class CreateContactInfoDto {
 
 	@OptionalApiProperty({
 		type: () => GeoLocation,
-		example: { latitude: '123', longitude: '456' },
 	})
 	location?: GeoLocation;
 }

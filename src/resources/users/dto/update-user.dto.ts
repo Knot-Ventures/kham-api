@@ -5,11 +5,11 @@ import { BusinessType, UserType } from '../entities/user.entity';
 
 export class UpdateUserDto {
 	@IsString()
-	@OptionalApiProperty()
+	@OptionalApiProperty({ example: 'John' })
 	firstName?: string;
 
 	@IsString()
-	@OptionalApiProperty()
+	@OptionalApiProperty({ example: 'Doe' })
 	lastName?: string;
 
 	@IsString()
@@ -25,19 +25,12 @@ export class UpdateUserDto {
 	businessType?: BusinessType;
 
 	@IsArray()
-	@ArrayMaxSize(256)
-	@OptionalApiProperty({ isArray: true })
+	@ArrayMaxSize(2)
+	@OptionalApiProperty({
+		isArray: true,
+		example: [
+			'c2aK9KHmw8E:APA91bF7MY9bNnvGAXgbHN58lyDxc9KnuXNXwsqUs4uV4GyeF06HM1hMm-etu63S_4C-GnEtHAxJPJJC4H__VcIk90A69qQz65toFejxyncceg0_j5xwoFWvPQ5pzKo69rUnuCl1GSSv',
+		],
+	})
 	fcmTokens?: string[];
-
-	@IsString()
-	@OptionalApiProperty()
-	authId: string;
-
-	@IsString()
-	@OptionalApiProperty()
-	contactInfoId?: string;
-
-	@IsString()
-	@OptionalApiProperty()
-	adminAccessId?: string;
 }

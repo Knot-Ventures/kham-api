@@ -6,6 +6,10 @@ import {
 } from 'passport-firebase-jwt';
 import * as firebase from 'firebase-admin';
 import { FirebaseService } from '../firebase/firebase.service';
+import { DrizzleService } from '../drizzle/drizzle.service';
+import Users from '../drizzle/schema/users';
+import { UsersService } from '../resources/users/users.service';
+import { resolve } from '../helpers/resolve';
 
 @Injectable()
 export class FirebaseAuthStrategy extends PassportStrategy(
@@ -13,7 +17,10 @@ export class FirebaseAuthStrategy extends PassportStrategy(
 ) {
 	private defaultApp: firebase.app.App;
 
-	constructor(private firebase: FirebaseService) {
+	constructor(
+		private firebase: FirebaseService,
+		private usersService: UsersService,
+	) {
 		super({
 			jwtFromRequest: (request) => {
 				return (
@@ -27,22 +34,21 @@ export class FirebaseAuthStrategy extends PassportStrategy(
 	async validate(token: string) {
 		console.log({ token });
 
-		const firebaseUser: any = await this.firebase.defaultApp
+		const firebaseUser = await this.firebase.defaultApp
 			.auth()
 			.verifyIdToken(token, true)
 			.catch((err) => {
 				console.log(err);
 				throw new UnauthorizedException(err.message);
 			});
-		console.log({ firebaseUser });
+
 		if (!firebaseUser) {
 			throw new UnauthorizedException();
 		}
+		const [user, error] = await resolve(
+			this.usersService.findOneByAuthId(firebaseUser.uid),
+		);
 
-		//TODO Get User from Database
-		const user = {};
-
-		console.log({ user });
 		return { data: user, firebaseUser };
 	}
 }

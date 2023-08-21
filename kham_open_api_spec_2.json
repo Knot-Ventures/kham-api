@@ -57,10 +57,34 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/UserEntity"
-                                    }
+                                    "$ref": "#/components/schemas/FindAllUsersResponseDto"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "security": [
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
+        "/users/me": {
+            "get": {
+                "operationId": "Users_getMe",
+                "summary": "Get the current user",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserEntity"
                                 }
                             }
                         }
@@ -156,40 +180,21 @@
                 ]
             }
         },
-        "/users/me": {
-            "get": {
-                "operationId": "Users_getMe",
-                "summary": "Get the current user",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UserEntity"
-                                }
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "users"
-                ],
-                "security": [
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/users/{id}/contact-info": {
+        "/users/{id}/contact-info/{contactInfoId}": {
             "patch": {
                 "operationId": "Users_updateContactInfo",
                 "summary": "Update user contact information",
                 "parameters": [
                     {
                         "name": "id",
+                        "required": true,
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "contactInfoId",
                         "required": true,
                         "in": "path",
                         "schema": {
@@ -502,63 +507,32 @@
                 ]
             },
             "delete": {
-                "operationId": "UserCatalogRequests_removeItems",
+                "operationId": "UserCatalogRequests_removeItemsFromRequest",
+                "summary": "Remove items from a catalog request",
                 "parameters": [
                     {
                         "name": "id",
                         "required": true,
                         "in": "path",
+                        "description": "Catalog request ID",
                         "schema": {
                             "type": "string"
                         }
                     }
                 ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ItemsDto"
-                            }
-                        }
-                    }
-                },
                 "responses": {
                     "200": {
-                        "description": ""
-                    }
-                },
-                "tags": [
-                    "users-catalog-requests"
-                ]
-            }
-        },
-        "/{uid}/catalog-requests/{id}/otherItems": {
-            "post": {
-                "operationId": "UserCatalogRequests_addItems",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ItemsDto"
+                        "description": "Items removed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatalogRequestItemEntity"
+                                }
                             }
                         }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": ""
+                    },
+                    "404": {
+                        "description": "Catalog request not found"
                     }
                 },
                 "tags": [
@@ -620,36 +594,35 @@
                 ]
             }
         },
-        "/{uid}/catalog-requests/{id}/item-count": {
-            "patch": {
-                "operationId": "UserCatalogRequests_updateItemCount",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "required": true,
-                        "in": "path",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
+        "/auth": {
+            "post": {
+                "operationId": "Auth_signIn",
+                "summary": "Sign In",
+                "parameters": [],
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/UpdateItemCountDto"
+                                "$ref": "#/components/schemas/SignInRequestDto"
                             }
                         }
                     }
                 },
                 "responses": {
-                    "200": {
-                        "description": ""
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SignInResponseDto"
+                                }
+                            }
+                        }
                     }
                 },
                 "tags": [
-                    "users-catalog-requests"
+                    "auth"
                 ]
             }
         },
@@ -1009,10 +982,12 @@
                 "type": "object",
                 "properties": {
                     "latitude": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "123"
                     },
                     "longitude": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "456"
                     }
                 },
                 "required": [
@@ -1024,30 +999,27 @@
                 "type": "object",
                 "properties": {
                     "governorate": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "Cairo"
                     },
                     "city": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "Nasr City"
                     },
                     "address": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "1st Area, Bld.02, Apt.01"
                     },
                     "phoneNumber": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "+20-123-456-7890"
                     },
                     "email": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "john.doe@kham.shop"
                     },
                     "location": {
-                        "example": {
-                            "latitude": "123",
-                            "longitude": "456"
-                        },
-                        "allOf": [
-                            {
-                                "$ref": "#/components/schemas/GeoLocation"
-                            }
-                        ]
+                        "$ref": "#/components/schemas/GeoLocation"
                     },
                     "default": {
                         "type": "boolean"
@@ -1065,10 +1037,12 @@
                 "type": "object",
                 "properties": {
                     "firstName": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "John"
                     },
                     "lastName": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "Doe"
                     },
                     "profileImage": {
                         "type": "string"
@@ -1089,28 +1063,23 @@
                         ]
                     },
                     "fcmTokens": {
+                        "example": [
+                            "c2aK9KHmw8E:APA91bF7MY9bNnvGAXgbHN58lyDxc9KnuXNXwsqUs4uV4GyeF06HM1hMm-etu63S_4C-GnEtHAxJPJJC4H__VcIk90A69qQz65toFejxyncceg0_j5xwoFWvPQ5pzKo69rUnuCl1GSSv"
+                        ],
                         "type": "array",
                         "items": {
                             "type": "array"
                         }
                     },
                     "authId": {
-                        "type": "string"
-                    },
-                    "contactInfoId": {
-                        "type": "string"
-                    },
-                    "adminAccessId": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "620268d0-3f51-11ee-935a-2721f441afd1"
                     },
                     "isActive": {
                         "type": "boolean"
                     },
                     "contactInfoData": {
                         "$ref": "#/components/schemas/CreateContactInfoDto"
-                    },
-                    "adminAccessData": {
-                        "$ref": "#/components/schemas/CreateAdminAccessDto"
                     }
                 },
                 "required": [
@@ -1123,33 +1092,44 @@
             "UserContactInfoEntity": {
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "62013050-3f51-11ee-935a-2721f441afd1"
+                    },
+                    "userId": {
+                        "type": "string",
+                        "example": "62013051-3f51-11ee-935a-2721f441afd1"
+                    },
+                    "governorate": {
+                        "type": "string",
+                        "example": "Cairo"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Nasr City"
+                    },
                     "address": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "1st Area, Bld.02, Apt.01"
+                    },
+                    "phoneNumber": {
+                        "type": "string",
+                        "example": "+20-123-456-7890"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "john.doe@kham.shop"
                     },
                     "location": {
                         "$ref": "#/components/schemas/GeoLocation"
-                    },
-                    "governorate": {
-                        "type": "string"
-                    },
-                    "phoneNumber": {
-                        "type": "string"
-                    },
-                    "id": {
-                        "type": "string"
-                    },
-                    "city": {
-                        "type": "string"
-                    },
-                    "email": {
-                        "type": "string"
                     },
                     "default": {
                         "type": "boolean"
                     }
                 },
                 "required": [
-                    "id"
+                    "id",
+                    "userId"
                 ]
             },
             "AdminAccessEntity": {
@@ -1181,13 +1161,16 @@
                 "type": "object",
                 "properties": {
                     "id": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "62013052-3f51-11ee-935a-2721f441afd1"
                     },
                     "firstName": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "John"
                     },
                     "lastName": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "Doe"
                     },
                     "profileImage": {
                         "type": "string"
@@ -1208,22 +1191,27 @@
                         ]
                     },
                     "fcmTokens": {
+                        "example": [
+                            "c2aK9KHmw8E:APA91bF7MY9bNnvGAXgbHN58lyDxc9KnuXNXwsqUs4uV4GyeF06HM1hMm-etu63S_4C-GnEtHAxJPJJC4H__VcIk90A69qQz65toFejxyncceg0_j5xwoFWvPQ5pzKo69rUnuCl1GSSv"
+                        ],
                         "type": "array",
                         "items": {
                             "type": "array"
                         }
                     },
                     "authId": {
-                        "type": "string"
-                    },
-                    "contactInfoId": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "62013053-3f51-11ee-935a-2721f441afd1"
                     },
                     "contactInfo": {
-                        "$ref": "#/components/schemas/UserContactInfoEntity"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserContactInfoEntity"
+                        }
                     },
                     "adminAccessId": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "62013054-3f51-11ee-935a-2721f441afd1"
                     },
                     "adminAccess": {
                         "$ref": "#/components/schemas/AdminAccessEntity"
@@ -1236,14 +1224,35 @@
                     "id",
                     "firstName",
                     "lastName",
-                    "profileImage",
                     "userType",
-                    "businessType",
-                    "fcmTokens",
                     "authId",
-                    "contactInfoId",
-                    "adminAccessId",
                     "isActive"
+                ]
+            },
+            "FindAllUsersResponseDto": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "number",
+                        "readOnly": true
+                    },
+                    "page": {
+                        "type": "number",
+                        "readOnly": true
+                    },
+                    "data": {
+                        "readOnly": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/UserEntity"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "limit",
+                    "page",
+                    "data"
                 ]
             },
             "UserType": {
@@ -1265,10 +1274,12 @@
                 "type": "object",
                 "properties": {
                     "firstName": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "John"
                     },
                     "lastName": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "Doe"
                     },
                     "profileImage": {
                         "type": "string"
@@ -1280,19 +1291,13 @@
                         "$ref": "#/components/schemas/BusinessType"
                     },
                     "fcmTokens": {
+                        "example": [
+                            "c2aK9KHmw8E:APA91bF7MY9bNnvGAXgbHN58lyDxc9KnuXNXwsqUs4uV4GyeF06HM1hMm-etu63S_4C-GnEtHAxJPJJC4H__VcIk90A69qQz65toFejxyncceg0_j5xwoFWvPQ5pzKo69rUnuCl1GSSv"
+                        ],
                         "type": "array",
                         "items": {
                             "type": "array"
                         }
-                    },
-                    "authId": {
-                        "type": "string"
-                    },
-                    "contactInfoId": {
-                        "type": "string"
-                    },
-                    "adminAccessId": {
-                        "type": "string"
                     }
                 }
             },
@@ -1300,7 +1305,8 @@
                 "type": "object",
                 "properties": {
                     "token": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "c2aK9KHmw8E:APA91bF7MY9bNnvGAXgbHN58lyDxc9KnuXNXwsqUs4uV4GyeF06HM1hMm-etu63S_4C-GnEtHAxJPJJC4H__VcIk90A69qQz65toFejxyncceg0_j5xwoFWvPQ5pzKo69rUnuCl1GSSv"
                     }
                 },
                 "required": [
@@ -1400,9 +1406,7 @@
                     "userId",
                     "requestContactInfoId",
                     "itemCount",
-                    "otherItems",
-                    "status",
-                    "notes"
+                    "status"
                 ]
             },
             "CatalogRequestEntity": {
@@ -1450,6 +1454,9 @@
                     "otherItems": {
                         "type": "object"
                     },
+                    "isRemoved": {
+                        "type": "boolean"
+                    },
                     "requestContactInfo": {
                         "$ref": "#/components/schemas/CatalogRequestContactInfoEntity"
                     },
@@ -1473,7 +1480,8 @@
                     "respondedAt",
                     "status",
                     "notes",
-                    "otherItems"
+                    "otherItems",
+                    "isRemoved"
                 ]
             },
             "UpdateCatalogRequestDto": {
@@ -1542,55 +1550,6 @@
                     "quantity"
                 ]
             },
-            "ItemsDto": {
-                "type": "object",
-                "properties": {}
-            },
-            "CatalogRequestItemEntity": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "catalog_entry_id": {
-                        "type": "string"
-                    },
-                    "catalog_request_id": {
-                        "type": "string"
-                    },
-                    "quantity": {
-                        "type": "number"
-                    }
-                },
-                "required": [
-                    "id",
-                    "catalog_entry_id",
-                    "catalog_request_id",
-                    "quantity"
-                ]
-            },
-            "UpdateCatalogRequestItemDto": {
-                "type": "object",
-                "properties": {
-                    "quantity": {
-                        "type": "number"
-                    }
-                },
-                "required": [
-                    "quantity"
-                ]
-            },
-            "UpdateItemCountDto": {
-                "type": "object",
-                "properties": {
-                    "itemCount": {
-                        "type": "number"
-                    }
-                },
-                "required": [
-                    "itemCount"
-                ]
-            },
             "ProductEntity": {
                 "type": "object",
                 "properties": {
@@ -1639,62 +1598,6 @@
                     "name",
                     "address",
                     "image"
-                ]
-            },
-            "CreateCatalogEntryDto": {
-                "type": "object",
-                "properties": {
-                    "productId": {
-                        "type": "string"
-                    },
-                    "vendorId": {
-                        "type": "string"
-                    },
-                    "description": {
-                        "type": "string"
-                    },
-                    "images": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "title": {
-                        "type": "string"
-                    },
-                    "subtitle": {
-                        "type": "string"
-                    },
-                    "min_qty": {
-                        "type": "number"
-                    },
-                    "available_qty": {
-                        "type": "number"
-                    },
-                    "unit": {
-                        "type": "string"
-                    },
-                    "average_market_price": {
-                        "type": "number"
-                    },
-                    "product": {
-                        "$ref": "#/components/schemas/ProductEntity"
-                    },
-                    "vendor": {
-                        "$ref": "#/components/schemas/VendorEntity"
-                    }
-                },
-                "required": [
-                    "productId",
-                    "vendorId",
-                    "description",
-                    "images",
-                    "title",
-                    "subtitle",
-                    "min_qty",
-                    "available_qty",
-                    "unit",
-                    "average_market_price"
                 ]
             },
             "CatalogEntryEntity": {
@@ -1748,6 +1651,156 @@
                 },
                 "required": [
                     "id",
+                    "productId",
+                    "vendorId",
+                    "description",
+                    "images",
+                    "title",
+                    "subtitle",
+                    "min_qty",
+                    "available_qty",
+                    "unit",
+                    "average_market_price"
+                ]
+            },
+            "CatalogRequestItemEntity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "catalog_entry_id": {
+                        "type": "string"
+                    },
+                    "catalog_request_id": {
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "type": "number"
+                    },
+                    "catalogEntry": {
+                        "$ref": "#/components/schemas/CatalogEntryEntity"
+                    },
+                    "catalogRequest": {
+                        "$ref": "#/components/schemas/CatalogRequestEntity"
+                    }
+                },
+                "required": [
+                    "id",
+                    "catalog_entry_id",
+                    "catalog_request_id",
+                    "quantity"
+                ]
+            },
+            "UpdateCatalogRequestItemDto": {
+                "type": "object",
+                "properties": {
+                    "quantity": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "quantity"
+                ]
+            },
+            "SignInRequestDto": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "email",
+                    "password"
+                ]
+            },
+            "SignInResponseDto": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "type": "string"
+                    },
+                    "localId": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "idToken": {
+                        "type": "string"
+                    },
+                    "registered": {
+                        "type": "boolean"
+                    },
+                    "refreshToken": {
+                        "type": "string"
+                    },
+                    "expiresIn": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "kind",
+                    "localId",
+                    "email",
+                    "displayName",
+                    "idToken",
+                    "registered",
+                    "refreshToken",
+                    "expiresIn"
+                ]
+            },
+            "CreateCatalogEntryDto": {
+                "type": "object",
+                "properties": {
+                    "productId": {
+                        "type": "string"
+                    },
+                    "vendorId": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "images": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "subtitle": {
+                        "type": "string"
+                    },
+                    "min_qty": {
+                        "type": "number"
+                    },
+                    "available_qty": {
+                        "type": "number"
+                    },
+                    "unit": {
+                        "type": "string"
+                    },
+                    "average_market_price": {
+                        "type": "number"
+                    },
+                    "product": {
+                        "$ref": "#/components/schemas/ProductEntity"
+                    },
+                    "vendor": {
+                        "$ref": "#/components/schemas/VendorEntity"
+                    }
+                },
+                "required": [
                     "productId",
                     "vendorId",
                     "description",

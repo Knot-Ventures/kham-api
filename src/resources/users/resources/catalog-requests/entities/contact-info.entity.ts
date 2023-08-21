@@ -2,7 +2,7 @@ import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { InferModel } from 'drizzle-orm';
 import catalogRequestContactInfo from '../../../../../drizzle/schema/catalog_request_contact_info';
 import { OptionalApiProperty } from '../../../../../openapi/decorators';
-import { GeoLocation } from '../../../../utilities/geolocation';
+import { GeoLocation } from '../../../../../data/geolocation';
 
 export type CatalogRequestContactInfoModel = InferModel<
 	typeof catalogRequestContactInfo
