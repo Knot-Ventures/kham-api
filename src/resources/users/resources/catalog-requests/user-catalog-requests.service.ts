@@ -5,21 +5,17 @@ import {
 	InternalServerErrorException,
 	NotFoundException,
 } from '@nestjs/common';
-import { DrizzleError, and, eq, sql } from 'drizzle-orm';
+import { and, DrizzleError, eq, sql } from 'drizzle-orm';
 import { DrizzleService } from '../../../../drizzle/drizzle.service';
 import catalogRequestContactInfo from '../../../../drizzle/schema/catalog_request_contact_info';
-import catalogRequestItems from '../../../../drizzle/schema/catalog_request_items';
 import catalogRequests from '../../../../drizzle/schema/catalog_requests';
 import { handleServiceError } from '../../../utilities/error-handling.util';
-import { CreateCatalogRequestItemDto } from './dto/create-catalog-request-item.dto';
-import { CreateCatalogRequestDto } from './dto/create-catalog-request.dto';
-import { SubmitCatalogRequestDto } from './dto/submit-catalog-request.dto';
-import { UpdateCatalogRequestItemDto } from './dto/update-catalog-request-item.dto';
-import { UpdateCatalogRequestDto } from './dto/update-catalog-request.dto';
-import { CatalogRequestItemsModel } from './entities/catalog-request-item.entity';
+import { CreateUserCatalogRequestDto } from './dto/requests/create-user-catalog-request.dto';
+import { SubmitUserCatalogRequestDto } from './dto/requests/submit-user-catalog-request.dto';
+import { UpdateCatalogRequestDto } from './dto/requests/update-catalog-request.dto';
+import { FindAllCatalogRequestsResponseDto } from './dto/responses/find-all-catalog-requests.response.dto';
 import {
 	CatalogRequestEntity,
-	CatalogRequestModel,
 	CatalogRequestStatusType,
 } from './entities/catalog-request.entity';
 
@@ -28,96 +24,127 @@ export class UserCatalogRequestsService {
 	constructor(private readonly drizzleService: DrizzleService) {}
 	//create
 	async create(
-		createCatalogRequestDto: CreateCatalogRequestDto,
-	): Promise<CatalogRequestModel> {
+		userId: string,
+		catalogRequestData: CreateUserCatalogRequestDto,
+	): Promise<CatalogRequestEntity> {
 		try {
-			const createdCatalogRequest =
-				await this.drizzleService.db.transaction(async (tx) => {
-					// Create the contact info first
-					const { requestContactInfo, ...catalogRequestData } =
-						createCatalogRequestDto;
-					const contactInfo = await tx
-						.insert(catalogRequestContactInfo)
-						.values(requestContactInfo)
-						.returning();
-					if (!contactInfo || contactInfo.length === 0) {
-						throw new InternalServerErrorException(
-							'Failed to create catalog request contact info',
-						);
-					}
+			const createdCatalogRequest = await this.drizzleService.db
+				.insert(catalogRequests)
+				.values({
+					userId,
+					...catalogRequestData,
+					status: CatalogRequestStatusType.Parked,
+					createdAt: new Date(),
+				})
+				.returning();
 
-					catalogRequestData.requestContactInfoId = contactInfo[0].id;
-					catalogRequestData.status = CatalogRequestStatusType.Parked;
-					catalogRequestData.createdAt = new Date();
-
-					const catalogRequest = await tx
-						.insert(catalogRequests)
-						.values(catalogRequestData)
-						.returning();
-
-					if (!catalogRequest || catalogRequest.length === 0) {
-						throw new InternalServerErrorException(
-							'Failed to create catalog request',
-						);
-					}
-					// Combine contactInfo and catalogRequest into a single object
-
-					return catalogRequest[0];
-				});
-			return createdCatalogRequest;
+			if (!createdCatalogRequest || createdCatalogRequest.length === 0) {
+				throw new InternalServerErrorException(
+					'Failed to create catalog request',
+				);
+			}
+			return createdCatalogRequest[0];
 		} catch (error) {
 			handleServiceError(error, 'Failed to create catalog request');
 		}
 	}
+
 	//submit
 	async submit(
-		submitCatalogRequestData: SubmitCatalogRequestDto,
-	): Promise<CatalogRequestModel> {
-		const { id, status, notes } = submitCatalogRequestData;
+		userId: string,
+		requestId: string,
+		submitCatalogRequestData: SubmitUserCatalogRequestDto,
+	): Promise<CatalogRequestEntity> {
+		const { requestContactInfo, status, notes } = submitCatalogRequestData;
 
 		try {
-			// Fetch the catalog request to be submitted
-			const catalogRequest = (
-				await this.drizzleService.db
-					.select({
-						count: sql<number>`count(${catalogRequests.id})`,
+			return this.drizzleService.db.transaction(async (tx) => {
+				// Fetch the catalog request to be submitted
+				const catalogRequest = (
+					await tx
+						.select({
+							count: sql<number>`count(${catalogRequests.id})`,
+						})
+						.from(catalogRequests)
+						.limit(1)
+						.where(eq(catalogRequests.id, requestId))
+				)?.[0]?.count;
+				if (!catalogRequest) {
+					throw new HttpException(
+						{
+							status: HttpStatus.NOT_FOUND,
+							error: 'Catalog request not found.',
+						},
+						HttpStatus.NOT_FOUND,
+					);
+				}
+
+				// Create the contact info
+
+				const contactInfo = await tx
+					.insert(catalogRequestContactInfo)
+					.values(requestContactInfo)
+					.returning();
+				if (!contactInfo || contactInfo.length === 0) {
+					throw new InternalServerErrorException(
+						'Failed to create catalog request contact info',
+					);
+				}
+
+				// Update the catalog request with the submitted data
+				const updatedCatalogRequest = await tx
+					.update(catalogRequests)
+					.set({
+						status,
+						notes,
+						submittedAt: new Date(),
+						requestContactInfoId: contactInfo[0].id,
 					})
-					.from(catalogRequests)
-					.limit(1)
-					.where(eq(catalogRequests.id, id))
-			)?.[0]?.count;
-			if (!catalogRequest) {
-				throw new HttpException(
-					{
-						status: HttpStatus.NOT_FOUND,
-						error: 'Catalog request not found.',
-					},
-					HttpStatus.NOT_FOUND,
-				);
-			}
+					.where(eq(catalogRequests.id, requestId))
+					.returning();
 
-			// Update the catalog request with the submitted data
-			const updatedCatalogRequest = await this.drizzleService.db
-				.update(catalogRequests)
-				.set({ status, notes, respondedAt: new Date() })
-				.where(eq(catalogRequests.id, id))
-				.returning();
+				const createdCatalogRequest = await tx
+					.insert(catalogRequests)
+					.values({
+						userId: userId,
+						status: CatalogRequestStatusType.Parked,
+						createdAt: new Date(),
+					})
+					.returning();
 
-			return updatedCatalogRequest[0];
+				if (
+					!createdCatalogRequest ||
+					createdCatalogRequest.length === 0
+				) {
+					throw new InternalServerErrorException(
+						'Failed to create a new catalog request',
+					);
+				}
+
+				return updatedCatalogRequest[0];
+			});
 		} catch (error) {
 			handleServiceError(error, 'Failed to submit catalog request');
 		}
 	}
+
 	//get All
-	async findAll(page: number, limit: number): Promise<CatalogRequestModel[]> {
+	async findAll(
+		page: number,
+		limit: number,
+	): Promise<FindAllCatalogRequestsResponseDto> {
 		const offset = (page - 1) * limit;
 
 		try {
-			return this.drizzleService.db
-				.select()
-				.from(catalogRequests)
-				.limit(limit)
-				.offset(offset);
+			return {
+				data: await this.drizzleService.db
+					.select()
+					.from(catalogRequests)
+					.limit(limit)
+					.offset(offset),
+				limit,
+				page,
+			};
 		} catch (error) {
 			if (error instanceof DrizzleError) {
 				console.error(error.message);
@@ -130,6 +157,7 @@ export class UserCatalogRequestsService {
 			}
 		}
 	}
+
 	//get by Id
 	async findOne(id: string): Promise<CatalogRequestEntity> {
 		try {
@@ -152,15 +180,21 @@ export class UserCatalogRequestsService {
 			handleServiceError(error, 'Failed to create catalog request');
 		}
 	}
+
 	//update
 	async update(
 		id: string,
 		updateCatalogRequestDto: UpdateCatalogRequestDto,
-	): Promise<CatalogRequestModel> {
+	): Promise<CatalogRequestEntity> {
 		const catalogRequestExists = (
 			await this.drizzleService.db
-				.select({ count: eq(catalogRequests.id, id) })
+				.select({
+					count: eq(catalogRequests.id, id),
+				})
 				.from(catalogRequests)
+				.where(
+					eq(catalogRequests.status, CatalogRequestStatusType.Parked),
+				)
 		)?.[0]?.count;
 
 		if (
@@ -168,7 +202,7 @@ export class UserCatalogRequestsService {
 			catalogRequestExists <= 0
 		) {
 			throw new NotFoundException(
-				`Catalog request with ID ${id} not found`,
+				`Catalog request with ID ${id} not found or not editable`,
 			);
 		}
 
@@ -188,108 +222,6 @@ export class UserCatalogRequestsService {
 			handleServiceError(error, 'Failed to update catalog request');
 		}
 	}
-	//add item to catalogRequestItem
-	async addItemsToRequest(
-		requestId: string,
-		createCatalogRequestItemDto: CreateCatalogRequestItemDto,
-	): Promise<CatalogRequestItemsModel> {
-		try {
-			const catalogRequest = await this.drizzleService.db
-				.select()
-				.from(catalogRequests)
-				.where(eq(catalogRequests.id, requestId))
-				.limit(1);
-
-			if (!catalogRequest[0]) {
-				throw new NotFoundException(
-					`Catalog request with ID ${requestId} not found`,
-				);
-			}
-
-			// Create a new catalog request item
-			const newItem = await this.drizzleService.db
-				.insert(catalogRequestItems)
-				.values({
-					...createCatalogRequestItemDto,
-					catalog_request_id: requestId,
-				})
-				.returning();
-
-			return newItem[0];
-		} catch (error) {
-			handleServiceError(
-				error,
-				'Failed to add item to catalogRequestItem',
-			);
-		}
-	}
-
-	//removeItemsFromRequest
-	async removeItemsFromRequest(
-		requestId: string,
-	): Promise<CatalogRequestItemsModel> {
-		try {
-			const catalogRequest = await this.drizzleService.db
-				.select()
-				.from(catalogRequests)
-				.where(eq(catalogRequests.id, requestId))
-				.limit(1);
-
-			if (!catalogRequest[0]) {
-				throw new NotFoundException(
-					`Catalog request with ID ${requestId} not found`,
-				);
-			}
-
-			// Remove items associated with the catalog request
-			const removedItems = await this.drizzleService.db
-				.delete(catalogRequestItems)
-				.where(eq(catalogRequestItems.catalog_request_id, requestId))
-				.returning();
-
-			return removedItems[0];
-		} catch (error) {
-			handleServiceError(error, 'Failed to remove item');
-		}
-	}
-
-	//updateItemQuantity
-	async updateItemQuantity(
-		requestId: string,
-		itemId: string,
-		updateItemDto: UpdateCatalogRequestItemDto,
-	): Promise<CatalogRequestItemsModel> {
-		try {
-			const catalogRequest = await this.drizzleService.db
-				.select()
-				.from(catalogRequests)
-				.where(eq(catalogRequests.id, requestId))
-				.limit(1);
-
-			if (!catalogRequest[0]) {
-				throw new NotFoundException(
-					`Catalog request with ID ${requestId} not found`,
-				);
-			}
-
-			// Check if the catalog request item exists and update its quantity
-			const updatedItem = await this.drizzleService.db
-				.update(catalogRequestItems)
-				.set({ quantity: updateItemDto.quantity })
-				.where(eq(catalogRequestItems.catalog_request_id, requestId))
-				.returning();
-
-			if (!updatedItem[0]) {
-				throw new NotFoundException(
-					`Item with ID ${itemId} not found in the catalog request`,
-				);
-			}
-
-			return updatedItem[0];
-		} catch (error) {
-			handleServiceError(error, 'Failed to update item count');
-		}
-	}
 
 	//delete
 	async cancelCatalogRequest(requestId: string) {
@@ -304,7 +236,7 @@ export class UserCatalogRequestsService {
 						eq(catalogRequests.id, requestId),
 						eq(
 							catalogRequests.status,
-							CatalogRequestStatusType.Parked,
+							CatalogRequestStatusType.PendingResponse,
 						),
 					),
 				);
@@ -317,7 +249,10 @@ export class UserCatalogRequestsService {
 
 			// Delete the catalog request
 			const deletedRequest = await this.drizzleService.db
-				.delete(catalogRequests)
+				.update(catalogRequests)
+				.set({
+					status: CatalogRequestStatusType.Canceled,
+				})
 				.where(eq(catalogRequests.id, requestId))
 				.returning();
 
