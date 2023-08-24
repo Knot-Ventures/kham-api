@@ -68,7 +68,7 @@
 		"@types/uuid": "^9.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.0.0",
 		"@typescript-eslint/parser": "^5.0.0",
-		"drizzle-kit": "^0.19.2",
+		"drizzle-kit": "^0.19.13",
 		"eslint": "^8.0.1",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-prettier": "^4.0.0",

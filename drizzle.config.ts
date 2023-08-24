@@ -3,18 +3,22 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env', override: false });
 
-const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
+const {
+	PGHOST,
+	PGDATABASE,
+	PGUSER,
+	PGPASSWORD,
+	ENDPOINT_ID,
+	PGPORT = '5432',
+} = process.env;
+const connectionString = `postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=prefer`;
 
 const config: Config = {
 	schema: './src/drizzle/schema/schema.ts',
 	out: './drizzle',
 	driver: 'pg',
 	dbCredentials: {
-		host: PGHOST,
-		user: PGUSER,
-		password: PGPASSWORD,
-		database: PGDATABASE,
-		ssl: false,
+		connectionString,
 	},
 };
 export default config;
