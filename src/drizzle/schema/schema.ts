@@ -3,7 +3,7 @@ import users, {
 	usersRelations,
 	userTypeEnum,
 } from './users';
-import products, { productsRelations } from './products';
+import products, { productsRelations, productIdentifierType } from './products';
 import usersContactInfo, {
 	userContactInfoRelations,
 } from './user_contact_info';
@@ -33,6 +33,7 @@ export {
 	//
 	products,
 	productsRelations,
+	productIdentifierType,
 	//
 	vendors,
 	vendorsRelations,

@@ -16,6 +16,7 @@ export class DrizzleService {
 	}
 
 	async initialize() {
+		// todo connect/disconnect on each request
 		const {
 			PGHOST,
 			PGDATABASE,

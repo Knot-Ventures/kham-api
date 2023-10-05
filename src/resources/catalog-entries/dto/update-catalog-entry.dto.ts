@@ -1,17 +1,7 @@
 import { IsArray, IsNumber, IsString } from 'class-validator';
 import { OptionalApiProperty } from '../../../openapi/decorators';
-import { ProductEntity } from '../entities/product.entity';
-import { VendorEntity } from '../entities/vendor.entity';
 
 export class UpdateCatalogEntryDto {
-	@IsString()
-	@OptionalApiProperty()
-	productId?: string;
-
-	@IsString()
-	@OptionalApiProperty()
-	vendorId?: string;
-
 	@IsString()
 	@OptionalApiProperty()
 	description?: string;
@@ -44,10 +34,4 @@ export class UpdateCatalogEntryDto {
 	@IsNumber()
 	@OptionalApiProperty()
 	average_market_price?: number;
-
-	@OptionalApiProperty({ type: () => ProductEntity })
-	product?: ProductEntity;
-
-	@OptionalApiProperty({ type: () => VendorEntity })
-	vendor?: VendorEntity;
 }

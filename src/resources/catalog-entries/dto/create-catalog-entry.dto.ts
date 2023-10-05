@@ -3,15 +3,17 @@ import { IsArray, IsNumber, IsString } from 'class-validator';
 import { OptionalApiProperty } from '../../../openapi/decorators';
 import { ProductEntity } from '../entities/product.entity';
 import { VendorEntity } from '../entities/vendor.entity';
+import { CreateProductDto } from './create-product.dto';
+import { CreateVendorDto } from './create-vendor.dto';
 
 export class CreateCatalogEntryDto {
 	@IsString()
-	@ApiProperty()
-	productId: string;
+	@OptionalApiProperty()
+	productId?: string;
 
 	@IsString()
-	@ApiProperty()
-	vendorId: string;
+	@OptionalApiProperty()
+	vendorId?: string;
 
 	@IsString()
 	@ApiProperty()
@@ -19,7 +21,7 @@ export class CreateCatalogEntryDto {
 
 	@IsArray()
 	@IsString({ each: true })
-	@ApiProperty({ type: [String] })
+	@OptionalApiProperty({ type: [String] })
 	images: string[];
 
 	@IsString()
@@ -27,7 +29,7 @@ export class CreateCatalogEntryDto {
 	title: string;
 
 	@IsString()
-	@ApiProperty()
+	@OptionalApiProperty()
 	subtitle: string;
 
 	@IsNumber()
@@ -46,9 +48,9 @@ export class CreateCatalogEntryDto {
 	@ApiProperty()
 	average_market_price: number;
 
-	@OptionalApiProperty({ type: () => ProductEntity })
-	product?: ProductEntity;
+	@OptionalApiProperty({ type: () => CreateProductDto })
+	productData?: CreateProductDto;
 
-	@OptionalApiProperty({ type: () => VendorEntity })
-	vendor?: VendorEntity;
+	@OptionalApiProperty({ type: () => CreateVendorDto })
+	vendorData?: CreateVendorDto;
 }

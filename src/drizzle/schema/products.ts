@@ -1,13 +1,19 @@
-import { pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core';
+import { pgEnum, pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import catalogEntries from './catalog_entries';
+
+export const productIdentifierType = pgEnum('product_identifier_type', [
+	'e_number',
+	'other',
+]);
 
 const products = pgTable('products', {
 	id: uuid('id').defaultRandom().primaryKey(),
 	name: varchar('name', { length: 256 }),
-	eNumber: varchar('e_number', { length: 6 }),
-	otherNames: text('other_names'),
-	uses: text('uses'),
+	identifier: varchar('identifier', { length: 6 }),
+	identifierType: productIdentifierType('identifier_type'),
+	otherNames: text('other_names').array(),
+	uses: text('uses').array(),
 });
 
 export default products;

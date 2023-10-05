@@ -24,7 +24,8 @@
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
 		"test:e2e": "jest --config ./test/jest-e2e.json",
 		"gcloud:submit-build": "gcloud builds submit --tag gcr.io/kham-shop/kham_api --project kham-shop --timeout=5h  --machine-type=N1_HIGHCPU_32",
-		"gcloud:deploy": "gcloud run deploy kham_api --region=us-east1 --image=gcr.io/kham-shop/kham_api --project=kham-shop --platform=managed --allow-unauthenticated --memory=1Gi --cpu=1 --port=3000 --no-use-http2",
+		"gcloud:deploy": "gcloud run deploy kham_api --region=us-east1 --image=gcr.io/kham-shop/kham_api --project=kham-shop --platform=managed --allow-unauthenticated --memory=1Gi --cpu=1 --port=3000 --no-use-http2 --env-vars-file .env.yaml",
+		"dev:gcloud:deploy": "gcloud run deploy kham_api_dev --region=us-east1 --image=gcr.io/kham-shop/kham_api --project=kham-shop --platform=managed --allow-unauthenticated --memory=1Gi --cpu=1 --port=3000 --no-use-http2 --env-vars-file .env.dev.yaml",
 		"gcloud:new-revision": "yarn gcloud:submit-build && yarn gcloud:deploy",
 		"drizzle:generate": "drizzle-kit generate:pg",
 		"drizzle:migrate": "ts-node ./src/drizzle/migrations.ts"
